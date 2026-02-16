@@ -42,6 +42,7 @@ def get_conn():
         user=st.secrets["DB_USER"],
         password=st.secrets["DB_PASSWORD"],
         port=int(st.secrets.get("DB_PORT", 5432)),
+        sslmode="require"
     )
 
 def init_db():
