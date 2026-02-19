@@ -43,10 +43,14 @@ def get_conn():
         database="postgres",
         user="postgres",
         password="Budget_Expense_Tracker",
-        port=5432
+        port=5432,
+        sslmode="require"
     )
 
-def init_db():
+def init_db_once():
+    if "db_initialized" in st.session_state:
+        return
+
     conn = get_conn()
     cur = conn.cursor()
 
@@ -75,7 +79,9 @@ def init_db():
     conn.commit()
     conn.close()
 
-init_db()
+    st.session_state["db_initialized"] = True
+
+init_db_once()
 
 # ==============================
 # HELPERS
