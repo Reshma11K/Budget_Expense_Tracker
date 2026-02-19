@@ -37,14 +37,13 @@ PAYMENT_METHODS = [
 # DATABASE (SUPABASE POSTGRES)
 # ==============================
 def get_conn():
-    print(f"Testing if we get values {st.secrets["DB_HOST"]}")
+    print(f"Testing if we get values {st.secrets["DB_PASSWORD "]}")
     return psycopg2.connect(
-        host=st.secrets["DB_HOST"],
-        database=st.secrets["DB_NAME"],
-        user=st.secrets["DB_USER"],
-        password=st.secrets["DB_PASSWORD"],
-        port=int(st.secrets["DB_PORT"]),
-        sslmode="require"
+        host="db.wleacljuyyihiqqnrtls.supabase.co",
+        database="postgres",
+        user="postgres",
+        password="Budget_Expense_Tracker",
+        port=5432
     )
 
 def init_db():
