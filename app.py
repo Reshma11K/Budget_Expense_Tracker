@@ -6,9 +6,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from dotenv import load_dotenv
 
-load_dotenv()  # loads .env into environment
-
-PASSWORD = os.getenv("PASSWORD")
 # ==============================
 # APP CONFIG
 # ==============================
@@ -40,6 +37,7 @@ PAYMENT_METHODS = [
 # DATABASE (SUPABASE POSTGRES)
 # ==============================
 def get_conn():
+    print(f"Testing if we get values {st.secrets["DB_HOST"]}")
     return psycopg2.connect(
         host=st.secrets["DB_HOST"],
         database=st.secrets["DB_NAME"],
