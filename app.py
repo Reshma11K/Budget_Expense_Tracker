@@ -8,9 +8,27 @@ import psycopg2
 import matplotlib.pyplot as plt
 
 st.set_page_config(page_title="Household Budget App", layout="wide")
-
 st.title("🏠 Household Budget App")
-st.write("Track income, expenses, budgets, recurring items and forecast your financial future.")
+
+# ==============================
+# CONSTANTS
+# ==============================
+INCOME_CATEGORIES = ["Salary", "Bonus", "Edenred", "Investments", "Other"]
+
+EXPENSE_CATEGORIES = [
+    "Grocery/Utilities", "Credit Cards", "India", "Transport",
+    "Foodgasm", "Wants/Need", "Entertainment", "Emergency", "Invest",
+    "Savings", "Travel", "Gifts", "Others"
+]
+
+RECURRING_CATEGORIES = [
+    "Rent", "Transport",
+    "Internet", "Electricity", "Scalable Savings", "Insurance", "Other"
+]
+
+PAYMENT_METHODS = [
+    "Cash", "Bank Transfer", "N26 V", "N26 R", "Edenred", "Amex", "Gebührenfrei", "Trade Republic"
+]
 
 # ==============================
 # DATABASE CONNECTION
@@ -44,17 +62,17 @@ def execute(query, params=None):
 # ==============================
 # TRANSACTIONS
 # ==============================
-def add_transaction(d, t_type, name, category, amount):
+def add_transaction(d, t_type, name, category, amount, payment_method=None):
     execute(
         """
-        INSERT INTO transactions (date, type, name, category, amount)
-        VALUES (%s,%s,%s,%s,%s)
+        INSERT INTO transactions (date, type, name, category, amount, payment_method)
+        VALUES (%s,%s,%s,%s,%s,%s)
         """,
-        (d, t_type, name, category, amount)
+        (d, t_type, name, category, amount, payment_method)
     )
 
 def load_transactions():
-    df = load_table("SELECT * FROM transactions")
+    df = load_table("SELECT * FROM transactions ORDER BY date DESC")
     if df.empty:
         return df
     df["date"] = pd.to_datetime(df["date"])
@@ -64,127 +82,195 @@ def load_transactions():
 # ==============================
 # RECURRING RULES
 # ==============================
-def add_recurring(name, t_type, category, amount, active):
+def add_recurring(d, t_type, name, category, amount, payment_method=None):
     execute(
         """
-        INSERT INTO recurring_rules (name, type, category, amount, active)
-        VALUES (%s,%s,%s,%s,%s)
+        INSERT INTO recurring_rules (date, type, name, category, amount, payment_method)
+        VALUES (%s,%s,%s,%s,%s,%s)
         """,
-        (name, t_type, category, amount, active)
+        (d, t_type, name, category, amount, payment_method)
     )
 
 # ==============================
-# INPUT FORMS
+# BUDGET
 # ==============================
-st.header("💰 Add Income")
-
-with st.form("income_form"):
-    source = st.text_input("Income Source")
-    category = st.text_input("Category")
-    amount = st.number_input("Amount", min_value=0.0)
-    submit = st.form_submit_button("Add Income")
-
-    if submit:
-        add_transaction(date.today(), "Income", source, category, amount)
-        st.success("Income added")
-        st.rerun()
-
-st.header("🧾 Add Expense")
-
-with st.form("expense_form"):
-    name = st.text_input("Expense Name")
-    category = st.text_input("Category")
-    amount = st.number_input("Amount", min_value=0.0)
-    submit = st.form_submit_button("Add Expense")
-
-    if submit:
-        add_transaction(date.today(), "Expense", name, category, amount)
-        st.success("Expense added")
-        st.rerun()
+def add_budget(month, category, amount):
+    execute(
+        """
+        INSERT INTO budgets (month, category, budget)
+        VALUES (%s,%s,%s)
+        """,
+        (month, category, amount)
+    )
 
 # ==============================
-# RECURRING RULES
+# TABS
 # ==============================
-st.header("🔁 Recurring Monthly Templates")
+tab_dashboard, tab_income, tab_expense, tab_recurring, tab_budget, tab_forecast, tab_log = st.tabs(
+    ["📊 Dashboard", "💰 Income", "🧾 Expenses", "🔁 Recurring", "📋 Budget", "🔮 Forecast", "📄 Log"]
+)
 
-with st.form("recurring_form"):
-    r_name = st.text_input("Name")
-    r_type = st.selectbox("Type", ["Income", "Expense"])
-    r_category = st.text_input("Category")
-    r_amount = st.number_input("Amount", min_value=0.0)
-    r_active = st.checkbox("Active", True)
+# ==============================
+# INCOME TAB
+# ==============================
+with tab_income:
+    st.subheader("Add Income")
 
-    if st.form_submit_button("Save Recurring Rule"):
-        add_recurring(r_name, r_type, r_category, r_amount, r_active)
-        st.success("Recurring rule saved")
-        st.rerun()
+    with st.form("income_form"):
+        source = st.text_input("Income Source")
+        category = st.selectbox("Category", INCOME_CATEGORIES)
+        amount = st.number_input("Amount", min_value=0.0)
+        if st.form_submit_button("Add Income"):
+            add_transaction(date.today(), "Income", source, category, amount)
+            st.success("Income added")
+            st.rerun()
 
-rules_df = load_table("SELECT * FROM recurring_rules")
+# ==============================
+# EXPENSE TAB
+# ==============================
+with tab_expense:
+    st.subheader("Add Expense")
 
-if not rules_df.empty:
-    st.subheader("✏️ Manage Recurring Rules")
-    edited = st.data_editor(rules_df, use_container_width=True)
+    with st.form("expense_form"):
+        name = st.text_input("Expense Name")
+        category = st.selectbox("Category", EXPENSE_CATEGORIES)
+        payment = st.selectbox("Payment Method", PAYMENT_METHODS)
+        amount = st.number_input("Amount", min_value=0.0)
+        if st.form_submit_button("Add Expense"):
+            add_transaction(date.today(), "Expense", name, category, amount, payment)
+            st.success("Expense added")
+            st.rerun()
 
-    if st.button("💾 Save Rule Changes"):
-        for _, r in edited.iterrows():
-            execute(
-                """
-                UPDATE recurring_rules
-                SET name=%s, type=%s, category=%s, amount=%s, active=%s
-                WHERE id=%s
-                """,
-                (r["name"], r["type"], r["category"], r["amount"], r["active"], r["id"])
+# ==============================
+# RECURRING TAB
+# ==============================
+with tab_recurring:
+    st.subheader("Recurring Rules")
+
+    with st.form("recurring_form"):
+        name = st.text_input("Name")
+        category = st.selectbox("Category", RECURRING_CATEGORIES)
+        payment = st.selectbox("Payment Method", PAYMENT_METHODS)
+        amount = st.number_input("Amount", min_value=0.0)
+        active = st.checkbox("Active", True)
+
+        if st.form_submit_button("Save Rule"):
+            add_recurring(date.today(), "Recurring", name, category, amount, payment)
+            st.success("Recurring rule saved")
+            st.rerun()
+
+
+# ==============================
+# DASHBOARD TAB
+# ==============================
+with tab_dashboard:
+    tx = load_transactions()
+
+    if not tx.empty:
+        months = sorted(tx["Month"].unique())
+        selected_month = st.selectbox("Select Month", months)
+
+        month_tx = tx[tx["Month"] == selected_month]
+        income = month_tx[month_tx["type"] == "Income"]["amount"].sum()
+        expenses = month_tx[month_tx["type"] == "Expense"]["amount"].sum()
+
+        c1, c2, c3 = st.columns(3)
+        c1.metric("Income", f"${income:,.2f}")
+        c2.metric("Expenses", f"${expenses:,.2f}")
+        c3.metric("Balance", f"${income-expenses:,.2f}")
+
+        if not month_tx.empty:
+            expense_data = (
+                month_tx[month_tx["type"] == "Expense"]
+                .groupby("category")["amount"]
+                .sum()
             )
-        st.success("Rules updated")
-        st.rerun()
+
+            if not expense_data.empty:
+                fig, ax = plt.subplots()
+                expense_data.plot(kind="bar", ax=ax)
+                ax.set_title("Expenses by Category")
+                st.pyplot(fig)
+            else:
+                st.info("No expenses recorded for this month yet.")
 
 # ==============================
-# DASHBOARD
+# BUDGET TAB
 # ==============================
-st.header("📊 Dashboard")
+with tab_budget:
+    tx = load_transactions()
+    if not tx.empty:
+        months = sorted(tx["Month"].unique())
+        month = st.selectbox("Month", months)
 
-tx = load_transactions()
+        with st.form("budget_form"):
+            category = st.selectbox("Category", EXPENSE_CATEGORIES)
+            amount = st.number_input("Budget Amount", min_value=0.0)
+            if st.form_submit_button("Save Budget"):
+                add_budget(month, category, amount)
+                st.success("Budget saved")
+                st.rerun()
 
-if not tx.empty:
-    months = sorted(tx["Month"].unique())
-    selected_month = st.selectbox("Select Month", months)
+        budgets = load_table("SELECT * FROM budgets WHERE month=%s", (month,))
+        if not budgets.empty:
+            expense_tx = tx[(tx["Month"] == month) & (tx["type"] == "Expense")]
+            actual = expense_tx.groupby("category")["amount"].sum().reset_index()
 
-    month_tx = tx[tx["Month"] == selected_month]
-    income = month_tx[month_tx["type"] == "Income"]["amount"].sum()
-    expenses = month_tx[month_tx["type"] == "Expense"]["amount"].sum()
+            comparison = pd.merge(
+                budgets, actual,
+                left_on="category",
+                right_on="category",
+                how="left"
+            ).fillna(0)
 
-    c1, c2, c3 = st.columns(3)
-    c1.metric("Income", f"${income:,.2f}")
-    c2.metric("Expenses", f"${expenses:,.2f}")
-    c3.metric("Balance", f"${income - expenses:,.2f}")
+            comparison["Variance"] = comparison["budget"] - comparison["amount"]
 
-    if not month_tx.empty:
-        fig, ax = plt.subplots()
-        month_tx[month_tx["type"] == "Expense"] \
-            .groupby("category")["amount"].sum().plot(kind="bar", ax=ax)
-        st.pyplot(fig)
+            st.dataframe(comparison, use_container_width=True)
+            st.bar_chart(comparison.set_index("category")[["budget", "amount"]])
 
 # ==============================
-# TRANSACTION LOG
+# FORECAST TAB
 # ==============================
-st.header("📄 Transaction Log")
+with tab_forecast:
+    tx = load_transactions()
+    rules = load_table("SELECT * FROM recurring_rules")
 
-if not tx.empty:
-    editor_df = tx.sort_values("date", ascending=False)[
-        ["id", "date", "type", "name", "category", "amount"]
-    ]
+    if not tx.empty and not rules.empty:
+        months_ahead = st.slider("Forecast Months", 1, 12, 6)
+        last_month = pd.Period(max(tx["Month"]), freq="M")
 
-    edited = st.data_editor(editor_df, use_container_width=True)
+        forecast_rows = []
 
-    if st.button("💾 Save Transaction Changes"):
-        for _, r in edited.iterrows():
-            execute(
-                """
-                UPDATE transactions
-                SET date=%s, type=%s, name=%s, category=%s, amount=%s
-                WHERE id=%s
-                """,
-                (r["date"], r["type"], r["name"], r["category"], r["amount"], r["id"])
-            )
-        st.success("Transactions updated")
-        st.rerun()
+        for i in range(1, months_ahead + 1):
+            future_month = str(last_month + i)
+            for _, r in rules.iterrows():
+                forecast_rows.append({
+                    "Month": future_month,
+                    "Type": r["type"],
+                    "Category": r["category"],
+                    "Amount": r["amount"]
+                })
+
+        forecast_df = pd.DataFrame(forecast_rows)
+        st.dataframe(forecast_df)
+
+# ==============================
+# LOG TAB
+# ==============================
+with tab_log:
+    tx = load_transactions()
+    if not tx.empty:
+        edited = st.data_editor(tx, use_container_width=True)
+
+        if st.button("Save Transaction Changes"):
+            for _, r in edited.iterrows():
+                execute(
+                    """
+                    UPDATE transactions
+                    SET date=%s, type=%s, name=%s, category=%s, amount=%s
+                    WHERE id=%s
+                    """,
+                    (r["date"], r["type"], r["name"], r["category"], r["amount"], r["id"])
+                )
+            st.success("Transactions updated")
+            st.rerun()
