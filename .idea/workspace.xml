@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="54592e58-93b8-4572-b018-559b60e49bb7" name="Changes" comment="updates">
+    <list default="true" id="54592e58-93b8-4572-b018-559b60e49bb7" name="Changes" comment="Fixed for adding transactions form with the new database fix">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,9 +22,21 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Reshma11K&quot;
+  }
+}</component>
   <component name="GithubDefaultAccount">
     <option name="defaultAccountId" value="0fdfae05-8760-4673-acf1-d15d5efe2091" />
   </component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Reshma11K/Budget_Expense_Tracker.git&quot;,
+    &quot;accountId&quot;: &quot;0fdfae05-8760-4673-acf1-d15d5efe2091&quot;
+  }
+}</component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 8
 }</component>
@@ -40,13 +51,14 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;
   }
 }</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-8753aad8314d-d902c0275401-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-252.25557.178" />
+        <option value="bundled-python-sdk-2653e85de345-6d6dccd035ac-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.31033.139" />
       </set>
     </attachedChunks>
   </component>
@@ -90,11 +102,110 @@
       <option name="project" value="LOCAL" />
       <updated>1771261187807</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="updates">
+      <option name="closed" value="true" />
+      <created>1771419779737</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1771419779737</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Test">
+      <option name="closed" value="true" />
+      <created>1771527695595</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1771527695595</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Fixed patch">
+      <option name="closed" value="true" />
+      <created>1771527842197</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1771527842207</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Added dotenv dependency">
+      <option name="closed" value="true" />
+      <created>1771528033090</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1771528033090</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Hard coded credentials">
+      <option name="closed" value="true" />
+      <created>1771528216520</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1771528216521</updated>
+    </task>
+    <task id="LOCAL-00010" summary="Hard coded credentials">
+      <option name="closed" value="true" />
+      <created>1771528298267</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1771528298267</updated>
+    </task>
+    <task id="LOCAL-00011" summary="Testing with initializing connection once">
+      <option name="closed" value="true" />
+      <created>1771528682627</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1771528682627</updated>
+    </task>
+    <task id="LOCAL-00012" summary="Switch to Secrets. Connect using Transacton pooler">
+      <option name="closed" value="true" />
+      <created>1771529337323</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1771529337323</updated>
+    </task>
+    <task id="LOCAL-00013" summary="Fixed for adding transactions from before">
+      <option name="closed" value="true" />
+      <created>1771530695388</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1771530695388</updated>
+    </task>
+    <task id="LOCAL-00014" summary="Fixed for adding transactions form with the new database fix">
+      <option name="closed" value="true" />
+      <created>1771847417893</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1771847417893</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="updates" />
-    <option name="LAST_COMMIT_MESSAGE" value="updates" />
+    <MESSAGE value="Test" />
+    <MESSAGE value="Fixed patch" />
+    <MESSAGE value="Added dotenv dependency" />
+    <MESSAGE value="Hard coded credentials" />
+    <MESSAGE value="Testing with initializing connection once" />
+    <MESSAGE value="Switch to Secrets. Connect using Transacton pooler" />
+    <MESSAGE value="Fixed for adding transactions from before" />
+    <MESSAGE value="Fixed for adding transactions form with the new database fix" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed for adding transactions form with the new database fix" />
   </component>
 </project>
