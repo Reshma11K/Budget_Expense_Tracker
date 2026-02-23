@@ -1,87 +1,11 @@
+# ==============================
+# IMPORTS & APP SETUP
+# ==============================
 import streamlit as st
 import pandas as pd
-from datetime import date
+from datetime import datetime, date
 import psycopg2
 import matplotlib.pyplot as plt
-import seaborn as sns
-from dotenv import load_dotenv
-
-# ==============================
-# APP CONFIG
-# ==============================
-st.set_page_config(page_title="Household Budget", layout="wide")
-st.title("🏠 Household Budget")
-st.caption("Personal finance command center")
-
-# ==============================
-# CONSTANTS
-# ==============================
-VARIABLE_EXPENSE_CATEGORIES = [
-    "Grocery/Utilities", "Foodgasm", "Wants/Need", "Entertainment",
-    "Emergency", "Invest", "Savings", "Travel", "Gifts", "Others"
-]
-
-RECURRING_EXPENSE_CATEGORIES = [
-    "Rent", "Mobile bills", "Internet", "Electricity",
-    "Scalable Savings", "Transportation Voo", "Transportation Ruu"
-]
-
-INCOME_CATEGORIES = ["Salary", "Bonus", "Tax Returns", "Edenred", "Other"]
-
-PAYMENT_METHODS = [
-    "Amex", "Gebührenfrei", "Trade Republic", "N26-R",
-    "N26-V", "Bank Transfer", "Edenred", "Cash"
-]
-
-# ==============================
-# DATABASE (SUPABASE POSTGRES)
-# ==============================
-def get_conn():
-    print(f"Testing if we get values {st.secrets["DB_PASSWORD"]}")
-    return psycopg2.connect(
-        host=st.secrets["DB_HOST"],
-        database=st.secrets["DB_NAME"],
-        user=st.secrets["DB_USER"],
-        password=st.secrets["DB_PASSWORD"],
-        port=int(st.secrets["DB_PORT"]),
-        sslmode="require"
-    )
-
-def init_db_once():
-    if "db_initialized" in st.session_state:
-        return
-
-    conn = get_conn()
-    cur = conn.cursor()
-
-    cur.execute("""
-    CREATE TABLE IF NOT EXISTS transactions (
-        id SERIAL PRIMARY KEY,
-        date DATE,
-        type TEXT,
-        name TEXT,
-        category TEXT,
-        amount NUMERIC,
-        expense_type TEXT,
-        payment_method TEXT
-    )
-    """)
-
-    cur.execute("""
-    CREATE TABLE IF NOT EXISTS budgets (
-        id SERIAL PRIMARY KEY,
-        month TEXT,
-        category TEXT,
-        budget NUMERIC
-    )
-    """)
-
-    conn.commit()
-    conn.close()
-
-    st.session_state["db_initialized"] = True
-
-init_db_once()
 
 st.set_page_config(page_title="Household Budget App", layout="wide")
 
