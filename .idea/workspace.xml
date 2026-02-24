@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="54592e58-93b8-4572-b018-559b60e49bb7" name="Changes" comment="updated recurring rule logic">
+    <list default="true" id="54592e58-93b8-4572-b018-559b60e49bb7" name="Changes" comment="Recurring income and expenses auto-apply. Month picker in dashboard.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
     </list>
@@ -199,7 +199,23 @@
       <option name="project" value="LOCAL" />
       <updated>1771864192851</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="updates- added a delete and edit feature for the data entry.">
+      <option name="closed" value="true" />
+      <created>1771936422718</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1771936422718</updated>
+    </task>
+    <task id="LOCAL-00018" summary="Recurring income and expenses auto-apply. Month picker in dashboard.">
+      <option name="closed" value="true" />
+      <created>1771950380584</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1771950380584</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -224,6 +240,8 @@
     <MESSAGE value="Fixed for adding transactions from before" />
     <MESSAGE value="Fixed for adding transactions form with the new database fix" />
     <MESSAGE value="updated recurring rule logic" />
-    <option name="LAST_COMMIT_MESSAGE" value="updated recurring rule logic" />
+    <MESSAGE value="updates- added a delete and edit feature for the data entry." />
+    <MESSAGE value="Recurring income and expenses auto-apply. Month picker in dashboard." />
+    <option name="LAST_COMMIT_MESSAGE" value="Recurring income and expenses auto-apply. Month picker in dashboard." />
   </component>
 </project>
