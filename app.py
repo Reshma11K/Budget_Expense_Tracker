@@ -7,6 +7,32 @@ from datetime import date
 from db import load_df, execute
 import matplotlib.pyplot as plt
 
+plt.rcParams.update({
+    "figure.facecolor": "#111111",
+    "axes.facecolor": "#1a1a1a",
+    "axes.edgecolor": "#333333",
+    "axes.labelcolor": "#dddddd",
+    "text.color": "#e6e6e6",
+    "xtick.color": "#bbbbbb",
+    "ytick.color": "#bbbbbb",
+    "grid.color": "#2a2a2a",
+    "legend.facecolor": "#1a1a1a",
+    "legend.edgecolor": "#333333",
+})
+
+# ==============================
+# DASHBOARD COLOR PALETTE
+# ==============================
+COLORS = {
+    "budget": "#6b7280",     # muted gray
+    "actual_ok": "#3b82f6",  # muted blue
+    "actual_bad": "#ef4444", # muted red
+    "income": "#22c55e",     # muted green
+    "expense": "#f97316",    # muted orange
+    "grid": "#374151",       # dark gray
+    "bg": "#1f2933"
+}
+
 st.set_page_config(page_title="Household Budget App", layout="wide")
 st.title("🏠 Household Budget App")
 
@@ -74,6 +100,15 @@ def get_month_options(existing_months, future_months=6):
 def get_default_month_index(months):
     current_month = str(pd.Timestamp.today().to_period("M"))
     return months.index(current_month) if current_month in months else 0
+
+def get_active_month():
+    """
+    Returns the globally selected month.
+    Falls back to current month if Dashboard hasn't set it yet.
+    """
+    if "active_month" in st.session_state:
+        return st.session_state["active_month"]
+    return str(pd.Timestamp.today().to_period("M"))
 
 def auto_apply_recurring_income(income_df, target_month):
     """
@@ -146,6 +181,43 @@ def auto_apply_recurring(expense_df, target_month):
 
     return added
 
+def auto_apply_recurring_budgets(target_month):
+    """
+    Auto-copies budgets from the previous month
+    if they do not exist for the target month.
+    Returns list of categories that were auto-added.
+    """
+    # Convert month string to Period
+    target_period = pd.Period(target_month, freq="M")
+    prev_month = str(target_period - 1)
+
+    # Load budgets
+    prev_budgets = load_df(
+        "SELECT category, budget FROM budgets WHERE month=%s",
+        (prev_month,)
+    )
+
+    if prev_budgets.empty:
+        return []
+
+    current_budgets = load_df(
+        "SELECT category FROM budgets WHERE month=%s",
+        (target_month,)
+    )
+
+    existing_categories = set(current_budgets["category"])
+    added = []
+
+    for _, row in prev_budgets.iterrows():
+        if row["category"] not in existing_categories:
+            execute(
+                """INSERT INTO budgets (month, category, budget)
+                   VALUES (%s,%s,%s)""",
+                (target_month, row["category"], row["budget"])
+            )
+            added.append(row["category"])
+
+    return added
 
 # ==============================
 # TABS (UNCHANGED)
@@ -176,7 +248,11 @@ with tab_income:
             st.rerun()
 
     st.divider()
+    active_month = get_active_month()
+    active_month = get_active_month()
     df = load_income()
+    df = df[df["Month"] == active_month]
+    df = df[df["Month"] == active_month]
     if not df.empty:
         df["Delete"] = False
         edited = st.data_editor(
@@ -237,8 +313,12 @@ with tab_expense:
             st.rerun()
 
     st.divider()
+    active_month = get_active_month()
     df = load_expenses()
-    df = df[df["expense_type"] == "Variable"]
+    df = df[
+        (df["expense_type"] == "Variable") &
+        (df["Month"] == active_month)
+        ]
     if not df.empty:
         df["Delete"] = False
         edited = st.data_editor(
@@ -309,8 +389,13 @@ with tab_recurring:
             st.rerun()
 
     st.divider()
+    active_month = get_active_month()
+    active_month = get_active_month()
     df = load_expenses()
-    df = df[df["expense_type"] == "Recurring"]
+    df = df[
+        (df["expense_type"] == "Recurring") &
+        (df["Month"] == active_month)
+        ]
     if not df.empty:
         df["Delete"] = False
         edited = st.data_editor(
@@ -358,168 +443,115 @@ with tab_dashboard:
     income_df = load_income()
     expense_df = load_expenses()
 
+    # ----- Month selection (ALWAYS visible) -----
+    existing_months = set(income_df.get("Month", [])).union(
+        set(expense_df.get("Month", []))
+    )
+
+    months = get_month_options(existing_months, future_months=6)
+    default_index = get_default_month_index(months)
+
+    month = st.selectbox(
+        "Month",
+        months,
+        index=default_index,
+        key="dashboard_month"
+    )
+
+    # Single source of truth
+    st.session_state["active_month"] = month
+
+    # ----- Auto-carry budgets -----
+    added_budgets = auto_apply_recurring_budgets(month)
+    if added_budgets:
+        st.info(
+            f"📋 Budgets carried over from last month: "
+            + ", ".join(added_budgets)
+        )
+
+    # ----- Auto-apply recurring income / expenses -----
+    added_inc = auto_apply_recurring_income(income_df, month)
+    added_exp = auto_apply_recurring(expense_df, month)
+
+    if added_inc:
+        income_df = load_income()
+    if added_exp:
+        expense_df = load_expenses()
+
+    # ----- If still no data, stop after selector -----
     if income_df.empty and expense_df.empty:
-        st.info("No data yet.")
-    else:
-        # ----- Month selection -----
-        existing_months = set(income_df["Month"]).union(set(expense_df["Month"]))
-        months = get_month_options(existing_months, future_months=6)
-        default_index = get_default_month_index(months)
+        st.info("No data yet. Start by adding income, expenses, or budgets.")
+        st.stop()
 
-        month = st.selectbox(
-            "Month",
-            months,
-            index=default_index,
-            key="dashboard_month"
-        )
+    # ==============================
+    # KPIs
+    # ==============================
+    income_total = income_df[income_df["Month"] == month]["amount"].sum()
+    expense_total = expense_df[expense_df["Month"] == month]["amount"].sum()
+    balance = income_total - expense_total
 
-        # ----- Auto-apply recurring -----
-        added_exp = auto_apply_recurring(expense_df, month)
-        added_inc = auto_apply_recurring_income(income_df, month)
+    c1, c2, c3 = st.columns(3)
+    c1.metric("Income", f"${income_total:,.2f}")
+    c2.metric("Expenses", f"${expense_total:,.2f}")
+    c3.metric(
+        "Balance",
+        f"${balance:,.2f}",
+        delta_color="inverse" if balance < 0 else "normal"
+    )
 
-        if added_inc:
-            st.info(
-                f"🔁 Auto-added recurring income for {month}: "
-                + ", ".join(added_inc)
-            )
-            income_df = load_income()
+    st.divider()
 
-        if added_exp:
-            st.info(
-                f"🔁 Auto-added recurring expenses for {month}: "
-                + ", ".join(added_exp)
-            )
-            expense_df = load_expenses()
+    # ==============================
+    # PREP DATA
+    # ==============================
+    budgets = load_df("SELECT category, budget FROM budgets WHERE month=%s", (month,))
+    actual = (
+        expense_df[expense_df["Month"] == month]
+        .groupby("category")["amount"]
+        .sum()
+        .reset_index()
+    )
 
-        # ----- KPIs -----
-        income_total = income_df[income_df["Month"] == month]["amount"].sum()
-        expense_total = expense_df[expense_df["Month"] == month]["amount"].sum()
-        balance = income_total - expense_total
+    if not budgets.empty:
+        comparison = budgets.merge(actual, on="category", how="left").fillna(0)
+        comparison["overspend"] = comparison["amount"] - comparison["budget"]
 
-        c1, c2, c3 = st.columns(3)
-        c1.metric("Income", f"${income_total:,.2f}")
-        c2.metric("Expenses", f"${expense_total:,.2f}")
+    # ==============================
+    # ROW 1: Actual vs Budget | Expense Composition
+    # ==============================
+    col1, col2 = st.columns(2)
 
-        balance_color = "normal"
-        if balance < 0:
-            balance_color = "inverse"
+    # ----- Actual vs Budget -----
+    with col1:
+        if not budgets.empty:
+            fig, ax = plt.subplots(figsize=(4, 3))
+            fig.patch.set_facecolor(COLORS["bg"])
+            ax.set_facecolor(COLORS["bg"])
 
-        c3.metric(
-            "Balance",
-            f"${balance:,.2f}",
-            delta=None,
-            delta_color=balance_color
-        )
+            x = range(len(comparison))
+            actual_colors = [
+                COLORS["actual_bad"] if a > b else COLORS["actual_ok"]
+                for a, b in zip(comparison["amount"], comparison["budget"])
+            ]
 
-        st.divider()
+            ax.bar(x, comparison["budget"], width=0.4,
+                   color=COLORS["budget"], label="Budget")
+            ax.bar([i + 0.4 for i in x], comparison["amount"], width=0.4,
+                   color=actual_colors, label="Actual")
 
-        # =============================
-        # ROW 1: Budget Variance | Actual vs Budget
-        # =============================
-        col1, col2 = st.columns(2)
+            ax.set_xticks([i + 0.2 for i in x])
+            ax.set_xticklabels(comparison["category"], rotation=30, ha="right", fontsize=8)
+            ax.set_title("Actual vs Budget", fontsize=10, color="white")
+            ax.tick_params(colors="white", labelsize=8)
+            ax.grid(axis="y", color=COLORS["grid"], alpha=0.4)
+            ax.legend(fontsize=8)
 
-        # ----- Budget Variance (PRIMARY DIAGNOSTIC) -----
-        with col1:
-            budgets = load_df("SELECT * FROM budgets WHERE month=%s", (month,))
+            st.pyplot(fig, use_container_width=False)
+        else:
+            st.info("No budgets set.")
 
-            if not budgets.empty:
-                actual = (
-                    expense_df[expense_df["Month"] == month]
-                    .groupby("category")["amount"]
-                    .sum()
-                    .reset_index()
-                )
-
-                comparison = budgets.merge(actual, on="category", how="left").fillna(0)
-                comparison["variance"] = comparison["amount"] - comparison["budget"]
-
-                fig, ax = plt.subplots(figsize=(4, 3))
-
-                colors = [
-                    "#d62728" if v > 0 else "#2ca02c"
-                    for v in comparison["variance"]
-                ]
-
-                ax.bar(
-                    comparison["category"],
-                    comparison["variance"],
-                    color=colors
-                )
-
-                ax.axhline(0, color="black", linewidth=0.8)
-
-                ax.set_title("Budget Variance", fontsize=10)
-                ax.set_ylabel("Actual − Budget", fontsize=9)
-                ax.set_xticklabels(
-                    comparison["category"],
-                    rotation=30,
-                    ha="right",
-                    fontsize=8
-                )
-
-                from matplotlib.patches import Patch
-                legend_items = [
-                    Patch(facecolor="#d62728", label="Overspent"),
-                    Patch(facecolor="#2ca02c", label="Under Budget")
-                ]
-                ax.legend(handles=legend_items, fontsize=8)
-
-                st.pyplot(fig, use_container_width=False)
-            else:
-                st.info("No budgets set for this month.")
-
-        # ----- Actual vs Budget (EXPLANATORY) -----
-        with col2:
-            if not budgets.empty:
-                fig, ax = plt.subplots(figsize=(4, 3))
-
-                categories = comparison["category"]
-                budget_vals = comparison["budget"]
-                actual_vals = comparison["amount"]
-
-                actual_colors = [
-                    "#d62728" if a > b else "#2ca02c"
-                    for a, b in zip(actual_vals, budget_vals)
-                ]
-
-                x = range(len(categories))
-
-                ax.bar(
-                    x,
-                    budget_vals,
-                    width=0.35,
-                    label="Budget",
-                    color="#7f7f7f"
-                )
-
-                ax.bar(
-                    [i + 0.35 for i in x],
-                    actual_vals,
-                    width=0.35,
-                    label="Actual",
-                    color=actual_colors
-                )
-
-                ax.set_xticks([i + 0.175 for i in x])
-                ax.set_xticklabels(categories, rotation=30, ha="right", fontsize=8)
-                ax.set_title("Actual vs Budget", fontsize=10)
-                ax.set_ylabel("Amount", fontsize=9)
-
-                from matplotlib.patches import Patch
-                legend_items = [
-                    Patch(facecolor="#7f7f7f", label="Budget"),
-                    Patch(facecolor="#2ca02c", label="Within Budget"),
-                    Patch(facecolor="#d62728", label="Overspent")
-                ]
-                ax.legend(handles=legend_items, fontsize=8)
-
-                st.pyplot(fig, use_container_width=False)
-
-        st.divider()
-
-        # =============================
-        # ROW 2: Expense Composition (DESCRIPTIVE)
-        # =============================
+    # ----- Expense Composition -----
+    with col2:
         category_spend = (
             expense_df[expense_df["Month"] == month]
             .groupby("category")["amount"]
@@ -528,108 +560,234 @@ with tab_dashboard:
 
         if not category_spend.empty:
             fig, ax = plt.subplots(figsize=(4, 3))
+            fig.patch.set_facecolor(COLORS["bg"])
+            ax.set_facecolor(COLORS["bg"])
 
-            wedges, _, _ = ax.pie(
+            ax.pie(
                 category_spend,
-                autopct="%1.0f%%",
                 startangle=90,
-                wedgeprops={"width": 0.35},
-                textprops={"fontsize": 8}
+                autopct="%1.0f%%",
+                wedgeprops={"width": 0.4},
+                textprops={"fontsize": 8, "color": "white"}
             )
 
+            ax.set_title("Expense Composition", fontsize=10, color="white")
+
             ax.legend(
-                wedges,
                 category_spend.index,
-                title="Category",
                 loc="center left",
                 bbox_to_anchor=(1.0, 0.5),
                 fontsize=8
             )
 
-            ax.set_title("Expense Composition", fontsize=10)
-
             st.pyplot(fig, use_container_width=False)
+        else:
+            st.info("No expenses.")
 
-        st.divider()
+    st.divider()
 
-        # =============================
-        # ROW 3: Income vs Expense Trend (STRATEGIC)
-        # =============================
-        income_trend = (
-            income_df.groupby("Month")["amount"]
-            .sum()
+    # ==============================
+    # ROW 2: Overspend Ranking | Monthly Cashflow
+    # ==============================
+    col3, col4 = st.columns(2)
+
+    # ----- Overspend Ranking -----
+    with col3:
+        if not budgets.empty:
+            overspent = comparison[comparison["overspend"] > 0] \
+                .sort_values("overspend", ascending=True)
+
+            if overspent.empty:
+                st.success("🎉 No categories overspent this month.")
+            else:
+                fig, ax = plt.subplots(figsize=(4, 3))
+                fig.patch.set_facecolor(COLORS["bg"])
+                ax.set_facecolor(COLORS["bg"])
+
+                ax.barh(
+                    overspent["category"],
+                    overspent["overspend"],
+                    color=COLORS["actual_bad"]
+                )
+
+                ax.set_title("Overspend Ranking", fontsize=10, color="white")
+                ax.set_xlabel("Over Budget Amount", fontsize=9, color="white")
+                ax.tick_params(colors="white", labelsize=8)
+                ax.grid(axis="x", color=COLORS["grid"], alpha=0.4)
+
+                st.pyplot(fig, use_container_width=False)
+
+    # ----- Monthly Cashflow -----
+    with col4:
+        cashflow = (
+            pd.DataFrame({
+                "Income": income_df.groupby("Month")["amount"].sum(),
+                "Expenses": expense_df.groupby("Month")["amount"].sum()
+            })
+            .fillna(0)
             .sort_index()
         )
 
-        expense_trend = (
-            expense_df.groupby("Month")["amount"]
-            .sum()
-            .sort_index()
+        fig, ax = plt.subplots(figsize=(4, 3))
+        fig.patch.set_facecolor(COLORS["bg"])
+        ax.set_facecolor(COLORS["bg"])
+
+        ax.plot(
+            cashflow.index,
+            cashflow["Income"],
+            marker="o",
+            color=COLORS["income"],
+            label="Income"
         )
 
-        trend_df = pd.DataFrame({
-            "Income": income_trend,
-            "Expenses": expense_trend
-        }).fillna(0)
+        ax.plot(
+            cashflow.index,
+            cashflow["Expenses"],
+            marker="o",
+            color=COLORS["expense"],
+            label="Expenses"
+        )
 
-        if not trend_df.empty:
-            fig, ax = plt.subplots(figsize=(7, 3))
+        ax.set_title("Monthly Cashflow", fontsize=10, color="white")
+        ax.set_ylabel("Amount", fontsize=9, color="white")
+        ax.tick_params(colors="white", labelsize=8)
+        ax.grid(color=COLORS["grid"], alpha=0.4)
+        ax.legend(fontsize=8)
 
-            trend_df.plot(ax=ax, marker="o")
-
-            ax.set_title("Income vs Expenses Over Time", fontsize=10)
-            ax.set_ylabel("Amount", fontsize=9)
-            ax.set_xlabel("Month", fontsize=9)
-            ax.legend(fontsize=8)
-            plt.xticks(rotation=30, fontsize=8)
-            plt.yticks(fontsize=8)
-
-            st.pyplot(fig, use_container_width=False)
+        st.pyplot(fig, use_container_width=False)
 
 # ==============================
-# BUDGET TAB (UNCHANGED – THIS FIXES YOUR ISSUE)
+# BUDGET TAB
 # ==============================
 with tab_budget:
-    expense_df = load_expenses()
-    if not expense_df.empty:
-        existing_months = set(expense_df["Month"].unique())
-        months = get_month_options(existing_months, future_months=6)
+    # ----- Use dashboard-selected month -----
+    month = st.session_state.get("active_month")
 
-        default_index = get_default_month_index(months)
+    if not month:
+        st.info("Select a month on the Dashboard to manage budgets.")
+    else:
+        st.caption(f"📅 Budgets for {month}")
 
-        month = st.selectbox(
-            "Month",
-            months,
-            index=default_index,
-            key="budget_month"
-        )
+        # ==============================
+        # Auto-carry budgets (run once per month)
+        # ==============================
+        carry_key = f"budgets_carried_{month}"
+        if not st.session_state.get(carry_key):
+            added_budgets = auto_apply_recurring_budgets(month)
+            if added_budgets:
+                st.info(
+                    f"📋 Budgets carried over from last month: "
+                    + ", ".join(added_budgets)
+                )
+            st.session_state[carry_key] = True
 
-        added = auto_apply_recurring(expense_df, month)
-        if added:
-            st.info(
-                f"🔁 Auto-added recurring expenses for {month}: "
-                + ", ".join(added)
-            )
-            expense_df = load_expenses()
-
+        # ==============================
+        # Add / Update Budget Form
+        # ==============================
         with st.form("budget_form"):
             category = st.selectbox("Category", EXPENSE_CATEGORIES)
             amount = st.number_input("Budget Amount", min_value=0.0)
+
             if st.form_submit_button("Save Budget"):
                 add_budget(month, category, amount)
                 st.rerun()
 
-        budgets = load_df("SELECT * FROM budgets WHERE month=%s", (month,))
-        if not budgets.empty:
+        # ==============================
+        # Load budgets + actuals
+        # ==============================
+        budgets = load_df(
+            "SELECT category, budget FROM budgets WHERE month=%s",
+            (month,)
+        )
+
+        expense_df = load_expenses()
+        expense_df = expense_df[expense_df["Month"] == month]
+
+        if budgets.empty:
+            st.info("No budgets set for this month.")
+        else:
             actual = (
-                expense_df[expense_df["Month"] == month]
+                expense_df
                 .groupby("category")["amount"]
                 .sum()
                 .reset_index()
             )
-            comparison = budgets.merge(actual, on="category", how="left").fillna(0)
+
+            comparison = budgets.merge(
+                actual,
+                on="category",
+                how="left"
+            ).fillna(0)
+
             comparison["Variance"] = comparison["budget"] - comparison["amount"]
-            st.dataframe(comparison, use_container_width=True)
+            comparison["Delete"] = False
+
+            # ==============================
+            # Editable Budget Table
+            # ==============================
+            edited = st.data_editor(
+                comparison,
+                use_container_width=True,
+                key="budget_editor",
+                column_config={
+                    "category": st.column_config.TextColumn(
+                        "Category",
+                        disabled=True
+                    ),
+                    "budget": st.column_config.NumberColumn(
+                        "Budget",
+                        min_value=0.0,
+                        format="%.2f"
+                    ),
+                    "amount": st.column_config.NumberColumn(
+                        "Actual",
+                        disabled=True,
+                        format="%.2f"
+                    ),
+                    "Variance": st.column_config.NumberColumn(
+                        disabled=True,
+                        format="%.2f"
+                    ),
+                    "Delete": st.column_config.CheckboxColumn("Delete")
+                }
+            )
+
+            col1, col2 = st.columns(2)
+
+            # ----- Save edits -----
+            with col1:
+                if st.button("💾 Save Budget Changes", key="save_budget_changes"):
+                    for _, r in edited.iterrows():
+                        execute(
+                            """
+                            UPDATE budgets
+                            SET budget=%s
+                            WHERE month=%s AND category=%s
+                            """,
+                            (r["budget"], month, r["category"])
+                        )
+                    st.success("Budgets updated")
+                    st.rerun()
+
+            # ----- Delete selected -----
+            with col2:
+                if st.button("🗑️ Delete Selected Budgets", key="delete_budget"):
+                    to_delete = edited.loc[
+                        edited["Delete"], "category"
+                    ].tolist()
+
+                    if to_delete:
+                        execute(
+                            """
+                            DELETE FROM budgets
+                            WHERE month=%s AND category = ANY(%s)
+                            """,
+                            (month, to_delete)
+                        )
+                        st.success("Selected budgets deleted")
+                        st.rerun()
+                    else:
+                        st.warning("No budgets selected for deletion.")
 
 # ==============================
 # LOG TAB (ORIGINAL BEHAVIOR PRESERVED)
