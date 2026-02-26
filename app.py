@@ -218,6 +218,13 @@ def auto_apply_recurring_budgets(target_month):
             added.append(row["category"])
 
     return added
+# ==============================
+# GLOBAL ACTIVE MONTH INIT
+# ==============================
+if "active_month" not in st.session_state:
+    st.session_state["active_month"] = str(
+        pd.Timestamp.today().to_period("M")
+    )
 
 # ==============================
 # TABS (UNCHANGED)
@@ -481,7 +488,6 @@ with tab_dashboard:
     # ----- If still no data, stop after selector -----
     if income_df.empty and expense_df.empty:
         st.info("No data yet. Start by adding income, expenses, or budgets.")
-        st.stop()
 
     # ==============================
     # KPIs
