@@ -57,6 +57,12 @@ PAYMENT_METHODS = [
     "Edenred", "Amex", "Gebührenfrei", "Trade Republic"
 ]
 
+# ==============================
+# BUDGET CATEGORIES (VARIABLE + RECURRING)
+BUDGET_CATEGORIES = sorted(
+    set(EXPENSE_CATEGORIES + RECURRING_CATEGORIES)
+)
+
 
 # ==============================
 # LOADERS (FIXED DATE PARSING)
@@ -79,13 +85,17 @@ def load_expenses():
     df["Month"] = df["date"].dt.to_period("M").astype(str)
     return df
 
-def add_budget(month, category, amount):
+def add_budget(month, category, amount, is_recurring=False):
     execute(
-        """INSERT INTO budgets (month, category, budget)
-           VALUES (%s,%s,%s)
-           ON CONFLICT (month, category)
-           DO UPDATE SET budget = EXCLUDED.budget""",
-        (month, category, amount)
+        """
+        INSERT INTO budgets (month, category, budget, is_recurring)
+        VALUES (%s,%s,%s,%s)
+        ON CONFLICT (month, category)
+        DO UPDATE SET
+            budget = EXCLUDED.budget,
+            is_recurring = EXCLUDED.is_recurring
+        """,
+        (month, category, amount, is_recurring)
     )
 
 def get_month_options(existing_months, future_months=6):
@@ -182,42 +192,42 @@ def auto_apply_recurring(expense_df, target_month):
     return added
 
 def auto_apply_recurring_budgets(target_month):
-    """
-    Auto-copies budgets from the previous month
-    if they do not exist for the target month.
-    Returns list of categories that were auto-added.
-    """
-    # Convert month string to Period
     target_period = pd.Period(target_month, freq="M")
     prev_month = str(target_period - 1)
 
-    # Load budgets
     prev_budgets = load_df(
-        "SELECT category, budget FROM budgets WHERE month=%s",
+        """
+        SELECT category, budget
+        FROM budgets
+        WHERE month=%s AND is_recurring = TRUE
+        """,
         (prev_month,)
     )
 
     if prev_budgets.empty:
         return []
 
-    current_budgets = load_df(
+    current = load_df(
         "SELECT category FROM budgets WHERE month=%s",
         (target_month,)
     )
 
-    existing_categories = set(current_budgets["category"])
+    existing = set(current["category"])
     added = []
 
-    for _, row in prev_budgets.iterrows():
-        if row["category"] not in existing_categories:
+    for _, r in prev_budgets.iterrows():
+        if r["category"] not in existing:
             execute(
-                """INSERT INTO budgets (month, category, budget)
-                   VALUES (%s,%s,%s)""",
-                (target_month, row["category"], row["budget"])
+                """
+                INSERT INTO budgets (month, category, budget, is_recurring)
+                VALUES (%s,%s,%s,TRUE)
+                """,
+                (target_month, r["category"], r["budget"])
             )
-            added.append(row["category"])
+            added.append(r["category"])
 
     return added
+
 # ==============================
 # GLOBAL ACTIVE MONTH INIT
 # ==============================
@@ -256,9 +266,7 @@ with tab_income:
 
     st.divider()
     active_month = get_active_month()
-    active_month = get_active_month()
     df = load_income()
-    df = df[df["Month"] == active_month]
     df = df[df["Month"] == active_month]
     if not df.empty:
         df["Delete"] = False
@@ -266,21 +274,27 @@ with tab_income:
             df,
             key="income_editor",
             use_container_width=True,
+            hide_index=True,  # ✅ removes index column
             column_config={
                 "date": st.column_config.DateColumn(
                     "Date",
                     format="YYYY-MM-DD"
                 ),
+                "source": st.column_config.TextColumn("Source"),
                 "category": st.column_config.SelectboxColumn(
                     "Category",
                     options=INCOME_CATEGORIES
                 ),
-                "id": st.column_config.NumberColumn(disabled=True),
+                "amount": st.column_config.NumberColumn(
+                    "Amount",
+                    format="%.2f"
+                ),
+
+                # 🔒 internal / hidden
+                "income_type": st.column_config.TextColumn(disabled=True),
+                "id": st.column_config.TextColumn(disabled=True),
                 "Month": st.column_config.TextColumn(disabled=True),
-                "income_type": st.column_config.SelectboxColumn(
-                    "Income Type",
-                    options=["One-time", "Recurring"]
-                )
+                "Delete": st.column_config.CheckboxColumn("Delete")
             }
         )
 
@@ -332,28 +346,25 @@ with tab_expense:
             df,
             key="expense_editor",
             use_container_width=True,
+            hide_index=True,  # ✅ removes index column
             column_config={
-                "date": st.column_config.DateColumn(
-                    "Date",
-                    format="YYYY-MM-DD"
-                ),
+                "date": st.column_config.DateColumn("Date", format="YYYY-MM-DD"),
+                "name": st.column_config.TextColumn("Name"),
                 "category": st.column_config.SelectboxColumn(
-                    "Category",
-                    options=EXPENSE_CATEGORIES
+                    "Category", options=EXPENSE_CATEGORIES
                 ),
                 "payment_method": st.column_config.SelectboxColumn(
-                    "Payment Method",
-                    options=PAYMENT_METHODS
+                    "Payment Method", options=PAYMENT_METHODS
                 ),
-                "expense_type": st.column_config.TextColumn(
-                    disabled=True
+                "amount": st.column_config.NumberColumn(
+                    "Amount", format="%.2f"
                 ),
-                "Month": st.column_config.TextColumn(
-                    disabled=True
-                ),
-                "id": st.column_config.NumberColumn(
-                    disabled=True
-                )
+
+                # hidden/internal
+                "expense_type": st.column_config.TextColumn(disabled=True),
+                "Month": st.column_config.TextColumn(disabled=True),
+                "id": st.column_config.TextColumn(disabled=True),
+                "Delete": st.column_config.CheckboxColumn("Delete")
             }
         )
 
@@ -396,7 +407,6 @@ with tab_recurring:
             st.rerun()
 
     st.divider()
-    active_month = get_active_month()
     active_month = get_active_month()
     df = load_expenses()
     df = df[
@@ -691,11 +701,16 @@ with tab_budget:
         # Add / Update Budget Form
         # ==============================
         with st.form("budget_form"):
-            category = st.selectbox("Category", EXPENSE_CATEGORIES)
+            category = st.selectbox("Category", BUDGET_CATEGORIES)
             amount = st.number_input("Budget Amount", min_value=0.0)
 
+            is_recurring = st.checkbox(
+                "🔁 Recurring budget (auto-applies every month)",
+                value=True
+            )
+
             if st.form_submit_button("Save Budget"):
-                add_budget(month, category, amount)
+                add_budget(month, category, amount, is_recurring)
                 st.rerun()
 
         # ==============================
@@ -733,26 +748,21 @@ with tab_budget:
             # ==============================
             edited = st.data_editor(
                 comparison,
-                use_container_width=True,
                 key="budget_editor",
+                use_container_width=True,
+                hide_index=True,  # ✅ removes index column
                 column_config={
                     "category": st.column_config.TextColumn(
-                        "Category",
-                        disabled=True
+                        "Category", disabled=True
                     ),
                     "budget": st.column_config.NumberColumn(
-                        "Budget",
-                        min_value=0.0,
-                        format="%.2f"
+                        "Budget", min_value=0.0, format="%.2f"
                     ),
                     "amount": st.column_config.NumberColumn(
-                        "Actual",
-                        disabled=True,
-                        format="%.2f"
+                        "Actual", disabled=True, format="%.2f"
                     ),
                     "Variance": st.column_config.NumberColumn(
-                        disabled=True,
-                        format="%.2f"
+                        "Variance", disabled=True, format="%.2f"
                     ),
                     "Delete": st.column_config.CheckboxColumn("Delete")
                 }
