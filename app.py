@@ -268,6 +268,13 @@ with tab_income:
     active_month = get_active_month()
     df = load_income()
     df = df[df["Month"] == active_month]
+
+    # keep id separately for DB actions
+    ids = df["id"]
+
+    # drop UI-hidden columns
+    df = df.drop(columns=["id", "income_type"])
+
     if not df.empty:
         df["Delete"] = False
         edited = st.data_editor(
@@ -297,6 +304,7 @@ with tab_income:
                 "Delete": st.column_config.CheckboxColumn("Delete")
             }
         )
+        edited["id"] = ids.values
 
         if st.button("Save Income Changes", key="save_income"):
             for _, r in edited.iterrows():
@@ -340,6 +348,10 @@ with tab_expense:
         (df["expense_type"] == "Variable") &
         (df["Month"] == active_month)
         ]
+
+    ids = df["id"]
+    df = df.drop(columns=["id", "expense_type"])
+
     if not df.empty:
         df["Delete"] = False
         edited = st.data_editor(
@@ -367,6 +379,7 @@ with tab_expense:
                 "Delete": st.column_config.CheckboxColumn("Delete")
             }
         )
+        edited["id"] = ids.values
 
         if st.button("Save Expense Changes", key="save_expense"):
             for _, r in edited.iterrows():
@@ -413,27 +426,37 @@ with tab_recurring:
         (df["expense_type"] == "Recurring") &
         (df["Month"] == active_month)
         ]
+
+    ids = df["id"]
+    df = df.drop(columns=["id", "expense_type"])
     if not df.empty:
         df["Delete"] = False
         edited = st.data_editor(
             df,
             key="recurring_editor",
             use_container_width=True,
+            hide_index=True,  # ✅ ADD THIS
             column_config={
                 "date": st.column_config.DateColumn("Date", format="YYYY-MM-DD"),
+                "name": st.column_config.TextColumn("Name"),
                 "category": st.column_config.SelectboxColumn(
-                    "Category",
-                    options=RECURRING_CATEGORIES
+                    "Category", options=RECURRING_CATEGORIES
                 ),
                 "payment_method": st.column_config.SelectboxColumn(
-                    "Payment Method",
-                    options=PAYMENT_METHODS
+                    "Payment Method", options=PAYMENT_METHODS
                 ),
+                "amount": st.column_config.NumberColumn(
+                    "Amount", format="%.2f"
+                ),
+
+                # hidden/internal
                 "expense_type": st.column_config.TextColumn(disabled=True),
                 "Month": st.column_config.TextColumn(disabled=True),
-                "id": st.column_config.NumberColumn(disabled=True)
+                "id": st.column_config.TextColumn(disabled=True),
+                "Delete": st.column_config.CheckboxColumn("Delete")
             }
         )
+        edited["id"] = ids.values
 
         if st.button("Save Recurring Changes", key="save_recurring"):
             for _, r in edited.iterrows():
@@ -676,134 +699,138 @@ with tab_dashboard:
 # BUDGET TAB
 # ==============================
 with tab_budget:
-    # ----- Use dashboard-selected month -----
     month = st.session_state.get("active_month")
 
     if not month:
         st.info("Select a month on the Dashboard to manage budgets.")
-    else:
-        st.caption(f"📅 Budgets for {month}")
+        st.stop()
 
-        # ==============================
-        # Auto-carry budgets (run once per month)
-        # ==============================
-        carry_key = f"budgets_carried_{month}"
-        if not st.session_state.get(carry_key):
-            added_budgets = auto_apply_recurring_budgets(month)
-            if added_budgets:
-                st.info(
-                    f"📋 Budgets carried over from last month: "
-                    + ", ".join(added_budgets)
-                )
-            st.session_state[carry_key] = True
+    st.caption(f"📅 Budgets for {month}")
 
-        # ==============================
-        # Add / Update Budget Form
-        # ==============================
-        with st.form("budget_form"):
-            category = st.selectbox("Category", BUDGET_CATEGORIES)
-            amount = st.number_input("Budget Amount", min_value=0.0)
+    # ------------------------------
+    # Add / Update Budget Form
+    # ------------------------------
+    with st.form("budget_form"):
+        category = st.selectbox("Category", BUDGET_CATEGORIES)
+        amount = st.number_input("Budget Amount", min_value=0.0)
 
-            is_recurring = st.checkbox(
-                "🔁 Recurring budget (auto-applies every month)",
-                value=True
-            )
-
-            if st.form_submit_button("Save Budget"):
-                add_budget(month, category, amount, is_recurring)
-                st.rerun()
-
-        # ==============================
-        # Load budgets + actuals
-        # ==============================
-        budgets = load_df(
-            "SELECT category, budget FROM budgets WHERE month=%s",
-            (month,)
+        is_recurring = st.checkbox(
+            "🔁 Recurring budget (auto-applies every month)",
+            value=True
         )
 
-        expense_df = load_expenses()
-        expense_df = expense_df[expense_df["Month"] == month]
+        if st.form_submit_button("Save Budget"):
+            add_budget(month, category, amount, is_recurring)
+            st.rerun()
 
-        if budgets.empty:
-            st.info("No budgets set for this month.")
-        else:
-            actual = (
-                expense_df
-                .groupby("category")["amount"]
-                .sum()
-                .reset_index()
-            )
+    st.divider()
 
-            comparison = budgets.merge(
-                actual,
-                on="category",
-                how="left"
-            ).fillna(0)
+    # ------------------------------
+    # Load budgets + actuals
+    # ------------------------------
+    budgets = load_df(
+        """
+        SELECT month, category, budget, is_recurring
+        FROM budgets
+        WHERE month=%s
+        """,
+        (month,)
+    )
 
-            comparison["Variance"] = comparison["budget"] - comparison["amount"]
-            comparison["Delete"] = False
+    expense_df = load_expenses()
+    expense_df = expense_df[expense_df["Month"] == month]
 
-            # ==============================
-            # Editable Budget Table
-            # ==============================
-            edited = st.data_editor(
-                comparison,
-                key="budget_editor",
-                use_container_width=True,
-                hide_index=True,  # ✅ removes index column
-                column_config={
-                    "category": st.column_config.TextColumn(
-                        "Category", disabled=True
-                    ),
-                    "budget": st.column_config.NumberColumn(
-                        "Budget", min_value=0.0, format="%.2f"
-                    ),
-                    "amount": st.column_config.NumberColumn(
-                        "Actual", disabled=True, format="%.2f"
-                    ),
-                    "Variance": st.column_config.NumberColumn(
-                        "Variance", disabled=True, format="%.2f"
-                    ),
-                    "Delete": st.column_config.CheckboxColumn("Delete")
-                }
-            )
+    if budgets.empty:
+        st.info("No budgets set for this month.")
+        st.stop()
 
-            col1, col2 = st.columns(2)
+    actual = (
+        expense_df
+        .groupby("category")["amount"]
+        .sum()
+        .reset_index()
+    )
 
-            # ----- Save edits -----
-            with col1:
-                if st.button("💾 Save Budget Changes", key="save_budget_changes"):
-                    for _, r in edited.iterrows():
-                        execute(
-                            """
-                            UPDATE budgets
-                            SET budget=%s
-                            WHERE month=%s AND category=%s
-                            """,
-                            (r["budget"], month, r["category"])
-                        )
-                    st.success("Budgets updated")
-                    st.rerun()
+    comparison = budgets.merge(
+        actual,
+        on="category",
+        how="left"
+    ).fillna(0)
 
-            # ----- Delete selected -----
-            with col2:
-                if st.button("🗑️ Delete Selected Budgets", key="delete_budget"):
-                    to_delete = edited.loc[
-                        edited["Delete"], "category"
-                    ].tolist()
+    comparison["Variance"] = comparison["budget"] - comparison["amount"]
+    comparison["Delete"] = False
 
-                    if to_delete:
-                        execute(
-                            """
-                            DELETE FROM budgets
-                            WHERE month=%s AND category = ANY(%s)
-                            """,
-                            (month, to_delete)
-                        )
-                        st.success("Selected budgets deleted")
-                        st.rerun()
-                    else:
-                        st.warning("No budgets selected for deletion.")
+    # ------------------------------
+    # Editable Budget Table
+    # ------------------------------
+    edited = st.data_editor(
+        comparison,
+        use_container_width=True,
+        hide_index=True,
+        key="budget_editor",
+        column_config={
+            "month": st.column_config.TextColumn(
+                "Month", disabled=True
+            ),
+            "category": st.column_config.TextColumn(
+                "Category", disabled=True
+            ),
+            "budget": st.column_config.NumberColumn(
+                "Budget", min_value=0.0, format="%.2f"
+            ),
+            "amount": st.column_config.NumberColumn(
+                "Actual", disabled=True, format="%.2f"
+            ),
+            "Variance": st.column_config.NumberColumn(
+                "Variance", disabled=True, format="%.2f"
+            ),
+            "is_recurring": st.column_config.CheckboxColumn(
+                "Recurring"
+            ),
+            "Delete": st.column_config.CheckboxColumn("Delete")
+        }
+    )
+
+    col1, col2 = st.columns(2)
+
+    # ------------------------------
+    # Save edits
+    # ------------------------------
+    with col1:
+        if st.button("💾 Save Budget Changes"):
+            for _, r in edited.iterrows():
+                execute(
+                    """
+                    UPDATE budgets
+                    SET budget=%s, is_recurring=%s
+                    WHERE month=%s AND category=%s
+                    """,
+                    (r["budget"], r["is_recurring"], month, r["category"])
+                )
+            st.success("Budgets updated")
+            st.rerun()
+
+    # ------------------------------
+    # Delete selected
+    # ------------------------------
+    with col2:
+        if st.button("🗑️ Delete Selected Budgets"):
+            to_delete = edited.loc[
+                edited["Delete"], "category"
+            ].tolist()
+
+            if not to_delete:
+                st.warning("No budgets selected for deletion.")
+            else:
+                execute(
+                    """
+                    DELETE FROM budgets
+                    WHERE month=%s AND category = ANY(%s)
+                    """,
+                    (month, to_delete)
+                )
+                st.success("Selected budgets deleted")
+                st.rerun()
 
 # ==============================
 # LOG TAB (ORIGINAL BEHAVIOR PRESERVED)
