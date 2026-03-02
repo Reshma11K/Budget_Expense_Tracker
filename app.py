@@ -258,15 +258,18 @@ with tab_income:
             ["One-time", "Recurring"]
         )
         if st.form_submit_button("Add Income"):
-            execute(
-                "INSERT INTO income (date, source, category, amount, income_type) VALUES (%s,%s,%s,%s,%s)",
-                (d, source, category, amount, income_type)
-            )
+            from backend.services.income_service import add_income
+
+            add_income(d, source, category, amount, income_type)
             st.rerun()
 
     st.divider()
     active_month = get_active_month()
-    df = load_income()
+
+    from backend.services.income_service import get_all_income
+
+    df = get_all_income()
+
     df = df[df["Month"] == active_month]
 
     # keep id separately for DB actions

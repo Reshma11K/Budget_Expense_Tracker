@@ -3,5 +3,5 @@
   <component name="Black">
     <option name="sdkName" value="Budget_Expense_Tracker" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="Budget_Expense_Tracker" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.13 (Budget_Expense_Tracker)" project-jdk-type="Python SDK" />
 </project>
