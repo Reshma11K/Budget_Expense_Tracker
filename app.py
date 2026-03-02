@@ -98,14 +98,30 @@ def add_budget(month, category, amount, is_recurring=False):
         (month, category, amount, is_recurring)
     )
 
-def get_month_options(existing_months, future_months=6):
+def get_month_options(existing_months):
     """
-    Returns a sorted list of YYYY-MM months including existing
-    months and N future months.
+    Returns:
+    - All months from Jan of current year → current month
+    - Next month
+    - Keeps existing months (safe if DB has data)
     """
-    today = pd.Timestamp.today().to_period("M")
-    future = [str(today + i) for i in range(future_months + 1)]
-    return sorted(set(existing_months).union(future))
+    today = pd.Timestamp.today()
+    current_period = today.to_period("M")
+
+    # All months from Jan → current month (same year)
+    year_start = pd.Period(f"{today.year}-01", freq="M")
+    months = {
+        str(year_start + i)
+        for i in range(current_period.month)
+    }
+
+    # Add next month
+    months.add(str(current_period + 1))
+
+    # Merge with DB months (defensive, future-proof)
+    months |= set(existing_months)
+
+    return sorted(months)
 
 def get_default_month_index(months):
     current_month = str(pd.Timestamp.today().to_period("M"))
@@ -488,7 +504,7 @@ with tab_dashboard:
         set(expense_df.get("Month", []))
     )
 
-    months = get_month_options(existing_months, future_months=6)
+    months = get_month_options(existing_months)
     default_index = get_default_month_index(months)
 
     month = st.selectbox(
