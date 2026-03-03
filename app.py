@@ -6,6 +6,29 @@ import pandas as pd
 from datetime import date
 from db import load_df, execute
 import matplotlib.pyplot as plt
+from backend.services.income_service import (
+    get_all_income,
+    add_income,
+    update_income,
+    delete_income,
+    auto_apply_recurring_income,
+)
+
+from backend.services.expense_service import (
+    get_all_expenses,
+    add_expense,
+    update_expense,
+    delete_expenses,
+    auto_apply_recurring_expenses,
+)
+
+from backend.services.budget_service import (
+    get_budgets_for_month,
+    add_or_update_budget,
+    update_budget,
+    delete_budgets,
+    auto_apply_recurring_budgets,
+)
 
 plt.rcParams.update({
     "figure.facecolor": "#111111",
@@ -48,7 +71,7 @@ EXPENSE_CATEGORIES = [
 ]
 
 RECURRING_CATEGORIES = [
-    "Rent", "Transport", "Internet", "Electricity",
+    "Rent", "Transport", "Internet", "Mobile charges", "Electricity",
     "Insurance", "Scalable Savings", "Other"
 ]
 
@@ -67,23 +90,6 @@ BUDGET_CATEGORIES = sorted(
 # ==============================
 # LOADERS (FIXED DATE PARSING)
 # ==============================
-def load_income():
-    df = load_df("SELECT * FROM income ORDER BY date DESC")
-    if df.empty:
-        df["Month"] = []
-        return df
-    df["date"] = pd.to_datetime(df["date"], format="mixed")
-    df["Month"] = df["date"].dt.to_period("M").astype(str)
-    return df
-
-def load_expenses():
-    df = load_df("SELECT * FROM expenses ORDER BY date DESC")
-    if df.empty:
-        df["Month"] = []
-        return df
-    df["date"] = pd.to_datetime(df["date"], format="mixed")
-    df["Month"] = df["date"].dt.to_period("M").astype(str)
-    return df
 
 def add_budget(month, category, amount, is_recurring=False):
     execute(
@@ -274,15 +280,15 @@ with tab_income:
             ["One-time", "Recurring"]
         )
         if st.form_submit_button("Add Income"):
-            execute(
-                "INSERT INTO income (date, source, category, amount, income_type) VALUES (%s,%s,%s,%s,%s)",
-                (d, source, category, amount, income_type)
-            )
+
+            add_income(d, source, category, amount, income_type)
             st.rerun()
 
     st.divider()
     active_month = get_active_month()
-    df = load_income()
+
+    df = get_all_income()
+
     df = df[df["Month"] == active_month]
 
     # keep id separately for DB actions
@@ -324,16 +330,18 @@ with tab_income:
 
         if st.button("Save Income Changes", key="save_income"):
             for _, r in edited.iterrows():
-                execute(
-                    "UPDATE income SET date=%s, source=%s, category=%s, amount=%s, income_type=%s WHERE id=%s",
-                    (r["date"], r["source"], r["category"], r["amount"], r["income_type"], r["id"])
+                update_income(
+                    r["id"],
+                    r["date"],
+                    r["source"],
+                    r["category"],
+                    r["amount"],
                 )
             st.rerun()
 
         if st.button("Delete Selected Income", key="delete_income"):
-            execute(
-                "DELETE FROM income WHERE id = ANY(%s)",
-                (edited.loc[edited["Delete"], "id"].tolist(),)
+            delete_income(
+                edited.loc[edited["Delete"], "id"].tolist()
             )
             st.rerun()
 
@@ -349,17 +357,12 @@ with tab_expense:
         payment = st.selectbox("Payment Method", PAYMENT_METHODS)
         amount = st.number_input("Amount", min_value=0.0)
         if st.form_submit_button("Add Expense"):
-            execute(
-                """INSERT INTO expenses
-                   (date, name, category, amount, payment_method, expense_type)
-                   VALUES (%s,%s,%s,%s,%s,'Variable')""",
-                (d, name, category, amount, payment)
-            )
+            add_expense(d, name, category, amount, payment, "Variable")
             st.rerun()
 
     st.divider()
     active_month = get_active_month()
-    df = load_expenses()
+    df = get_all_expenses()
     df = df[
         (df["expense_type"] == "Variable") &
         (df["Month"] == active_month)
@@ -399,19 +402,19 @@ with tab_expense:
 
         if st.button("Save Expense Changes", key="save_expense"):
             for _, r in edited.iterrows():
-                execute(
-                    """UPDATE expenses
-                       SET date=%s, name=%s, category=%s, amount=%s, payment_method=%s
-                       WHERE id=%s""",
-                    (r["date"], r["name"], r["category"],
-                     r["amount"], r["payment_method"], r["id"])
+                update_expense(
+                    r["id"],
+                    r["date"],
+                    r["name"],
+                    r["category"],
+                    r["amount"],
+                    r["payment_method"],
                 )
             st.rerun()
 
         if st.button("Delete Selected Expenses", key="delete_expense"):
-            execute(
-                "DELETE FROM expenses WHERE id = ANY(%s)",
-                (edited.loc[edited["Delete"], "id"].tolist(),)
+            delete_expenses(
+                edited.loc[edited["Delete"], "id"].tolist()
             )
             st.rerun()
 
@@ -427,17 +430,12 @@ with tab_recurring:
         payment = st.selectbox("Payment Method", PAYMENT_METHODS)
         amount = st.number_input("Amount", min_value=0.0)
         if st.form_submit_button("Save Recurring"):
-            execute(
-                """INSERT INTO expenses
-                   (date, name, category, amount, payment_method, expense_type)
-                   VALUES (%s,%s,%s,%s,%s,'Recurring')""",
-                (d, name, category, amount, payment)
-            )
+            add_expense(d, name, category, amount, payment, "Recurring")
             st.rerun()
 
     st.divider()
     active_month = get_active_month()
-    df = load_expenses()
+    df = get_all_expenses()
     df = df[
         (df["expense_type"] == "Recurring") &
         (df["Month"] == active_month)
@@ -496,8 +494,8 @@ with tab_recurring:
 # DASHBOARD
 # ==============================
 with tab_dashboard:
-    income_df = load_income()
-    expense_df = load_expenses()
+    income_df = get_all_income()
+    expense_df = get_all_expenses()
 
     # ----- Month selection (ALWAYS visible) -----
     existing_months = set(income_df.get("Month", [])).union(
@@ -527,12 +525,12 @@ with tab_dashboard:
 
     # ----- Auto-apply recurring income / expenses -----
     added_inc = auto_apply_recurring_income(income_df, month)
-    added_exp = auto_apply_recurring(expense_df, month)
+    added_exp = auto_apply_recurring_expenses(expense_df, month)
 
     if added_inc:
-        income_df = load_income()
+        income_df = get_all_income()
     if added_exp:
-        expense_df = load_expenses()
+        expense_df = get_all_expenses()
 
     # ----- If still no data, stop after selector -----
     if income_df.empty and expense_df.empty:
@@ -736,7 +734,7 @@ with tab_budget:
         )
 
         if st.form_submit_button("Save Budget"):
-            add_budget(month, category, amount, is_recurring)
+            add_or_update_budget(month, category, amount, is_recurring)
             st.rerun()
 
     st.divider()
@@ -744,16 +742,9 @@ with tab_budget:
     # ------------------------------
     # Load budgets + actuals
     # ------------------------------
-    budgets = load_df(
-        """
-        SELECT month, category, budget, is_recurring
-        FROM budgets
-        WHERE month=%s
-        """,
-        (month,)
-    )
+    budgets = get_budgets_for_month(month)
 
-    expense_df = load_expenses()
+    expense_df = get_all_expenses()
     expense_df = expense_df[expense_df["Month"] == month]
 
     if budgets.empty:
@@ -815,13 +806,11 @@ with tab_budget:
     with col1:
         if st.button("💾 Save Budget Changes"):
             for _, r in edited.iterrows():
-                execute(
-                    """
-                    UPDATE budgets
-                    SET budget=%s, is_recurring=%s
-                    WHERE month=%s AND category=%s
-                    """,
-                    (r["budget"], r["is_recurring"], month, r["category"])
+                update_budget(
+                    month,
+                    r["category"],
+                    r["budget"],
+                    r["is_recurring"]
                 )
             st.success("Budgets updated")
             st.rerun()
@@ -838,13 +827,7 @@ with tab_budget:
             if not to_delete:
                 st.warning("No budgets selected for deletion.")
             else:
-                execute(
-                    """
-                    DELETE FROM budgets
-                    WHERE month=%s AND category = ANY(%s)
-                    """,
-                    (month, to_delete)
-                )
+                delete_budgets(month, to_delete)
                 st.success("Selected budgets deleted")
                 st.rerun()
 
@@ -853,7 +836,7 @@ with tab_budget:
 # ==============================
 with tab_log:
     st.subheader("Income Log")
-    inc = load_income()
+    inc = get_all_income()
     if not inc.empty:
         edited = st.data_editor(inc, use_container_width=True, key="log_income")
         if st.button("Save Income Changes", key="log_save_income"):
@@ -865,7 +848,7 @@ with tab_log:
             st.rerun()
 
     st.subheader("Expense Log")
-    exp = load_expenses()
+    exp = get_all_expenses()
     if not exp.empty:
         edited = st.data_editor(exp, use_container_width=True, key="log_expense")
         if st.button("Save Expense Changes", key="log_save_expense"):
