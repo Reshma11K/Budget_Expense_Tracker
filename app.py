@@ -6,6 +6,12 @@ import pandas as pd
 from datetime import date
 from db import load_df, execute
 import matplotlib.pyplot as plt
+
+import requests
+
+API_URL = "http://127.0.0.1:8000"
+
+
 from backend.services.income_service import (
     get_all_income,
     add_income,
@@ -250,6 +256,13 @@ def auto_apply_recurring_budgets(target_month):
 
     return added
 
+def get_dashboard_summary_api(month):
+    r = requests.get(
+        f"{API_URL}/dashboard-summary",
+        params={"month": month}
+    )
+    return r.json()
+
 # ==============================
 # GLOBAL ACTIVE MONTH INIT
 # ==============================
@@ -271,17 +284,27 @@ tab_dashboard, tab_income, tab_expense, tab_recurring, tab_budget, tab_log = st.
 with tab_income:
     st.subheader("Add Income")
     with st.form("income_form"):
-        d = st.date_input("Date", value=date.today())
-        source = st.text_input("Income Source")
-        category = st.selectbox("Category", INCOME_CATEGORIES)
-        amount = st.number_input("Amount", min_value=0.0)
+        d = st.date_input("Date", value=date.today(), key="income_date")
+        source = st.text_input("Income Source", key="income_source")
+        category = st.selectbox("Category", INCOME_CATEGORIES, key="income_category")
+        amount = st.number_input("Amount", min_value=0.0, key="income_amount")
+
         income_type = st.selectbox(
             "Income Type",
-            ["One-time", "Recurring"]
+            ["One-time", "Recurring"],
+            key="income_type"
         )
-        if st.form_submit_button("Add Income"):
 
-            add_income(d, source, category, amount, income_type)
+        if st.form_submit_button("Add Income"):
+            execute(
+                "INSERT INTO income (date, source, category, amount, income_type) VALUES (%s,%s,%s,%s,%s)",
+                (d, source, category, amount, income_type)
+            )
+
+            # 🔹 reset fields
+            st.session_state["income_source"] = ""
+            st.session_state["income_amount"] = 0.0
+
             st.rerun()
 
     st.divider()
@@ -351,13 +374,23 @@ with tab_income:
 with tab_expense:
     st.subheader("Add Variable Expense")
     with st.form("expense_form"):
-        d = st.date_input("Date", value=date.today())
-        name = st.text_input("Expense Name")
-        category = st.selectbox("Category", EXPENSE_CATEGORIES)
-        payment = st.selectbox("Payment Method", PAYMENT_METHODS)
-        amount = st.number_input("Amount", min_value=0.0)
+        d = st.date_input("Date", value=date.today(), key="expense_date")
+        name = st.text_input("Expense Name", key="expense_name")
+        category = st.selectbox("Category", EXPENSE_CATEGORIES, key="expense_category")
+        payment = st.selectbox("Payment Method", PAYMENT_METHODS, key="expense_payment")
+        amount = st.number_input("Amount", min_value=0.0, key="expense_amount")
+
         if st.form_submit_button("Add Expense"):
-            add_expense(d, name, category, amount, payment, "Variable")
+            execute(
+                """INSERT INTO expenses
+                   (date, name, category, amount, payment_method, expense_type)
+                   VALUES (%s,%s,%s,%s,%s,'Variable')""",
+                (d, name, category, amount, payment)
+            )
+
+            st.session_state["expense_name"] = ""
+            st.session_state["expense_amount"] = 0.0
+
             st.rerun()
 
     st.divider()
@@ -424,13 +457,24 @@ with tab_expense:
 with tab_recurring:
     st.subheader("Add Recurring Expense")
     with st.form("recurring_form"):
-        d = st.date_input("Start Date", value=date.today())
-        name = st.text_input("Name")
-        category = st.selectbox("Category", RECURRING_CATEGORIES)
-        payment = st.selectbox("Payment Method", PAYMENT_METHODS)
-        amount = st.number_input("Amount", min_value=0.0)
+        d = st.date_input("Start Date", value=date.today(), key="recurring_date")
+        name = st.text_input("Name", key="recurring_name")
+        category = st.selectbox("Category", RECURRING_CATEGORIES, key="recurring_category")
+        payment = st.selectbox("Payment Method", PAYMENT_METHODS, key="recurring_payment")
+        amount = st.number_input("Amount", min_value=0.0, key="recurring_amount")
+
         if st.form_submit_button("Save Recurring"):
-            add_expense(d, name, category, amount, payment, "Recurring")
+            execute(
+                """INSERT INTO expenses
+                   (date, name, category, amount, payment_method, expense_type)
+                   VALUES (%s,%s,%s,%s,%s,'Recurring')""",
+                (d, name, category, amount, payment)
+            )
+
+            # 🔹 clear fields after saving
+            st.session_state["recurring_name"] = ""
+            st.session_state["recurring_amount"] = 0.0
+
             st.rerun()
 
     st.divider()
@@ -539,16 +583,18 @@ with tab_dashboard:
     # ==============================
     # KPIs
     # ==============================
-    income_total = income_df[income_df["Month"] == month]["amount"].sum()
-    expense_total = expense_df[expense_df["Month"] == month]["amount"].sum()
-    balance = income_total - expense_total
+    summary = get_dashboard_summary_api(month)
+
+    income_total = summary["income_total"]
+    expense_total = summary["expense_total"]
+    balance = summary["balance"]
 
     c1, c2, c3 = st.columns(3)
-    c1.metric("Income", f"${income_total:,.2f}")
-    c2.metric("Expenses", f"${expense_total:,.2f}")
+    c1.metric("Income", f"€{income_total:,.2f}")
+    c2.metric("Expenses", f"€{expense_total:,.2f}")
     c3.metric(
         "Balance",
-        f"${balance:,.2f}",
+        f"€{balance:,.2f}",
         delta_color="inverse" if balance < 0 else "normal"
     )
 
@@ -725,8 +771,8 @@ with tab_budget:
     # Add / Update Budget Form
     # ------------------------------
     with st.form("budget_form"):
-        category = st.selectbox("Category", BUDGET_CATEGORIES)
-        amount = st.number_input("Budget Amount", min_value=0.0)
+        category = st.selectbox("Category", BUDGET_CATEGORIES, key="budget_category")
+        amount = st.number_input("Budget Amount", min_value=0.0, key="budget_amount")
 
         is_recurring = st.checkbox(
             "🔁 Recurring budget (auto-applies every month)",
@@ -734,7 +780,11 @@ with tab_budget:
         )
 
         if st.form_submit_button("Save Budget"):
-            add_or_update_budget(month, category, amount, is_recurring)
+            add_budget(month, category, amount, is_recurring)
+
+            # 🔹 reset amount field
+            st.session_state["budget_amount"] = 0.0
+
             st.rerun()
 
     st.divider()
