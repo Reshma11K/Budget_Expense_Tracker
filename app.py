@@ -256,6 +256,18 @@ def auto_apply_recurring_budgets(target_month):
 
     return added
 
+def get_income_api(month):
+    r = requests.get(
+        f"{API_URL}/income",
+        params={"month": month}
+    )
+    df = pd.DataFrame(r.json())
+
+    if not df.empty:
+        df["date"] = pd.to_datetime(df["date"])
+
+    return df
+
 def get_dashboard_summary_api(month):
     r = requests.get(
         f"{API_URL}/dashboard-summary",
@@ -310,9 +322,7 @@ with tab_income:
     st.divider()
     active_month = get_active_month()
 
-    df = get_all_income()
-
-    df = df[df["Month"] == active_month]
+    df = get_income_api(active_month)
 
     # keep id separately for DB actions
     ids = df["id"]
