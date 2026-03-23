@@ -4,11 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="54592e58-93b8-4572-b018-559b60e49bb7" name="Changes" comment="updated main.py">
-      <change afterPath="$PROJECT_DIR$/backend/services/dashboard_service.py" afterDir="false" />
+    <list default="true" id="54592e58-93b8-4572-b018-559b60e49bb7" name="Changes" comment="Income (read) → API">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -298,7 +296,23 @@
       <option name="project" value="LOCAL" />
       <updated>1772558982181</updated>
     </task>
-    <option name="localTasksCounter" value="28" />
+    <task id="LOCAL-00028" summary="updated dashboard_service.py">
+      <option name="closed" value="true" />
+      <created>1774282001947</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1774282001947</updated>
+    </task>
+    <task id="LOCAL-00029" summary="Income (read) → API">
+      <option name="closed" value="true" />
+      <created>1774283193843</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1774283193843</updated>
+    </task>
+    <option name="localTasksCounter" value="30" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -358,6 +372,8 @@
     <MESSAGE value="clean service layer" />
     <MESSAGE value="Created a minimal API server" />
     <MESSAGE value="updated main.py" />
-    <option name="LAST_COMMIT_MESSAGE" value="updated main.py" />
+    <MESSAGE value="updated dashboard_service.py" />
+    <MESSAGE value="Income (read) → API" />
+    <option name="LAST_COMMIT_MESSAGE" value="Income (read) → API" />
   </component>
 </project>

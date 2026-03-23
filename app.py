@@ -268,6 +268,18 @@ def get_income_api(month):
 
     return df
 
+def get_expenses_api(month):
+    r = requests.get(
+        f"{API_URL}/expenses",
+        params={"month": month}
+    )
+    df = pd.DataFrame(r.json())
+
+    if not df.empty:
+        df["date"] = pd.to_datetime(df["date"])
+
+    return df
+
 def get_dashboard_summary_api(month):
     r = requests.get(
         f"{API_URL}/dashboard-summary",
@@ -295,7 +307,7 @@ tab_dashboard, tab_income, tab_expense, tab_recurring, tab_budget, tab_log = st.
 # ==============================
 with tab_income:
     st.subheader("Add Income")
-    with st.form("income_form"):
+    with st.form("income_form", clear_on_submit=True):
         d = st.date_input("Date", value=date.today(), key="income_date")
         source = st.text_input("Income Source", key="income_source")
         category = st.selectbox("Category", INCOME_CATEGORIES, key="income_category")
@@ -313,9 +325,7 @@ with tab_income:
                 (d, source, category, amount, income_type)
             )
 
-            # 🔹 reset fields
-            st.session_state["income_source"] = ""
-            st.session_state["income_amount"] = 0.0
+
 
             st.rerun()
 
@@ -383,7 +393,7 @@ with tab_income:
 # ==============================
 with tab_expense:
     st.subheader("Add Variable Expense")
-    with st.form("expense_form"):
+    with st.form("expense_form", clear_on_submit=True):
         d = st.date_input("Date", value=date.today(), key="expense_date")
         name = st.text_input("Expense Name", key="expense_name")
         category = st.selectbox("Category", EXPENSE_CATEGORIES, key="expense_category")
@@ -398,18 +408,12 @@ with tab_expense:
                 (d, name, category, amount, payment)
             )
 
-            st.session_state["expense_name"] = ""
-            st.session_state["expense_amount"] = 0.0
-
             st.rerun()
 
     st.divider()
     active_month = get_active_month()
-    df = get_all_expenses()
-    df = df[
-        (df["expense_type"] == "Variable") &
-        (df["Month"] == active_month)
-        ]
+    df = get_expenses_api(active_month)
+    df = df[df["expense_type"] == "Variable"]
 
     ids = df["id"]
     df = df.drop(columns=["id", "expense_type"])
@@ -466,7 +470,7 @@ with tab_expense:
 # ==============================
 with tab_recurring:
     st.subheader("Add Recurring Expense")
-    with st.form("recurring_form"):
+    with st.form("recurring_form", clear_on_submit=True):
         d = st.date_input("Start Date", value=date.today(), key="recurring_date")
         name = st.text_input("Name", key="recurring_name")
         category = st.selectbox("Category", RECURRING_CATEGORIES, key="recurring_category")
@@ -481,19 +485,12 @@ with tab_recurring:
                 (d, name, category, amount, payment)
             )
 
-            # 🔹 clear fields after saving
-            st.session_state["recurring_name"] = ""
-            st.session_state["recurring_amount"] = 0.0
-
             st.rerun()
 
     st.divider()
     active_month = get_active_month()
-    df = get_all_expenses()
-    df = df[
-        (df["expense_type"] == "Recurring") &
-        (df["Month"] == active_month)
-        ]
+    df = get_expenses_api(active_month)
+    df = df[df["expense_type"] == "Recurring"]
 
     ids = df["id"]
     df = df.drop(columns=["id", "expense_type"])
@@ -780,7 +777,7 @@ with tab_budget:
     # ------------------------------
     # Add / Update Budget Form
     # ------------------------------
-    with st.form("budget_form"):
+    with st.form("budget_form", clear_on_submit=True):
         category = st.selectbox("Category", BUDGET_CATEGORIES, key="budget_category")
         amount = st.number_input("Budget Amount", min_value=0.0, key="budget_amount")
 
@@ -791,9 +788,6 @@ with tab_budget:
 
         if st.form_submit_button("Save Budget"):
             add_budget(month, category, amount, is_recurring)
-
-            # 🔹 reset amount field
-            st.session_state["budget_amount"] = 0.0
 
             st.rerun()
 
