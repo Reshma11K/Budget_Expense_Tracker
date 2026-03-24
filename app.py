@@ -280,6 +280,17 @@ def get_expenses_api(month):
 
     return df
 
+def create_income_api(payload: dict):
+    r = requests.post(f"{API_URL}/income", json=payload)
+    r.raise_for_status()
+    return r.json()
+
+
+def create_expense_api(payload: dict):
+    r = requests.post(f"{API_URL}/expenses", json=payload)
+    r.raise_for_status()
+    return r.json()
+
 def get_dashboard_summary_api(month):
     r = requests.get(
         f"{API_URL}/dashboard-summary",
@@ -320,10 +331,13 @@ with tab_income:
         )
 
         if st.form_submit_button("Add Income"):
-            execute(
-                "INSERT INTO income (date, source, category, amount, income_type) VALUES (%s,%s,%s,%s,%s)",
-                (d, source, category, amount, income_type)
-            )
+            create_income_api({
+                "date": str(d),
+                "source": source,
+                "category": category,
+                "amount": amount,
+                "income_type": income_type
+            })
 
 
 
@@ -401,12 +415,14 @@ with tab_expense:
         amount = st.number_input("Amount", min_value=0.0, key="expense_amount")
 
         if st.form_submit_button("Add Expense"):
-            execute(
-                """INSERT INTO expenses
-                   (date, name, category, amount, payment_method, expense_type)
-                   VALUES (%s,%s,%s,%s,%s,'Variable')""",
-                (d, name, category, amount, payment)
-            )
+            create_expense_api({
+                "date": str(d),
+                "name": name,
+                "category": category,
+                "amount": amount,
+                "payment_method": payment,
+                "expense_type": "Variable"
+            })
 
             st.rerun()
 
@@ -478,12 +494,14 @@ with tab_recurring:
         amount = st.number_input("Amount", min_value=0.0, key="recurring_amount")
 
         if st.form_submit_button("Save Recurring"):
-            execute(
-                """INSERT INTO expenses
-                   (date, name, category, amount, payment_method, expense_type)
-                   VALUES (%s,%s,%s,%s,%s,'Recurring')""",
-                (d, name, category, amount, payment)
-            )
+            create_expense_api({
+                "date": str(d),
+                "name": name,
+                "category": category,
+                "amount": amount,
+                "payment_method": payment,
+                "expense_type": "Recurring"
+            })
 
             st.rerun()
 
