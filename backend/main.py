@@ -58,6 +58,18 @@ def create_income(income: IncomeCreate):
     )
     return {"status": "created"}
 
+@app.put("/income/{income_id}")
+def update_income_api(income_id: int, income: IncomeCreate):
+    from backend.services.income_service import update_income
+
+    update_income(
+        income_id,
+        income.date,
+        income.source,
+        income.category,
+        income.amount,
+    )
+    return {"status": "updated"}
 
 @app.delete("/income/{income_id}")
 def remove_income(income_id: int):
@@ -84,6 +96,20 @@ def create_expense(expense: ExpenseCreate):
         expense.expense_type,
     )
     return {"status": "created"}
+
+@app.put("/expenses/{expense_id}")
+def update_expense_api(expense_id: int, expense: ExpenseCreate):
+    from backend.services.expense_service import update_expense
+
+    update_expense(
+        expense_id,
+        expense.date,
+        expense.name,
+        expense.category,
+        expense.amount,
+        expense.payment_method,
+    )
+    return {"status": "updated"}
 
 @app.delete("/expenses/{expense_id}")
 def remove_expense(expense_id: int):

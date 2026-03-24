@@ -387,19 +387,21 @@ with tab_income:
 
         if st.button("Save Income Changes", key="save_income"):
             for _, r in edited.iterrows():
-                update_income(
-                    r["id"],
-                    r["date"],
-                    r["source"],
-                    r["category"],
-                    r["amount"],
+                requests.put(
+                    f"{API_URL}/income/{r['id']}",
+                    json={
+                        "date": str(r["date"]),
+                        "source": r["source"],
+                        "category": r["category"],
+                        "amount": r["amount"],
+                        "income_type": "One-time"
+                    }
                 )
             st.rerun()
 
         if st.button("Delete Selected Income", key="delete_income"):
-            delete_income(
-                edited.loc[edited["Delete"], "id"].tolist()
-            )
+            for id in edited.loc[edited["Delete"], "id"]:
+                requests.delete(f"{API_URL}/income/{id}")
             st.rerun()
 
 # ==============================
@@ -465,20 +467,22 @@ with tab_expense:
 
         if st.button("Save Expense Changes", key="save_expense"):
             for _, r in edited.iterrows():
-                update_expense(
-                    r["id"],
-                    r["date"],
-                    r["name"],
-                    r["category"],
-                    r["amount"],
-                    r["payment_method"],
+                requests.put(
+                    f"{API_URL}/expenses/{r['id']}",
+                    json={
+                        "date": str(r["date"]),
+                        "name": r["name"],
+                        "category": r["category"],
+                        "amount": r["amount"],
+                        "payment_method": r["payment_method"],
+                        "expense_type": "Variable"
+                    }
                 )
             st.rerun()
 
         if st.button("Delete Selected Expenses", key="delete_expense"):
-            delete_expenses(
-                edited.loc[edited["Delete"], "id"].tolist()
-            )
+            for id in edited.loc[edited["Delete"], "id"]:
+                requests.delete(f"{API_URL}/expenses/{id}")
             st.rerun()
 
 # ==============================
@@ -543,20 +547,22 @@ with tab_recurring:
 
         if st.button("Save Recurring Changes", key="save_recurring"):
             for _, r in edited.iterrows():
-                execute(
-                    """UPDATE expenses
-                       SET date=%s, name=%s, category=%s, amount=%s, payment_method=%s
-                       WHERE id=%s""",
-                    (r["date"], r["name"], r["category"],
-                     r["amount"], r["payment_method"], r["id"])
+                requests.put(
+                    f"{API_URL}/expenses/{r['id']}",
+                    json={
+                        "date": str(r["date"]),
+                        "name": r["name"],
+                        "category": r["category"],
+                        "amount": r["amount"],
+                        "payment_method": r["payment_method"],
+                        "expense_type": "Recurring"
+                    }
                 )
             st.rerun()
 
         if st.button("Delete Selected Recurring", key="delete_recurring"):
-            execute(
-                "DELETE FROM expenses WHERE id = ANY(%s)",
-                (edited.loc[edited["Delete"], "id"].tolist(),)
-            )
+            for id in edited.loc[edited["Delete"], "id"]:
+                requests.delete(f"{API_URL}/expenses/{id}")
             st.rerun()
 
 # ==============================
