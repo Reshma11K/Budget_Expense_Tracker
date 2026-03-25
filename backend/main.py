@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, Depends
 from backend.services.income_service import (
     get_all_income,
     add_income,
@@ -16,6 +16,8 @@ from backend.services.expense_service import (
 from backend.services.dashboard_service import get_dashboard_summary
 
 app = FastAPI()
+
+from backend.auth import create_token, verify_token
 
 class IncomeCreate(BaseModel):
     date: str
@@ -37,8 +39,41 @@ def root():
     return {"message": "Budget API is alive"}
 
 
+from backend.services.auth_service import authenticate_user
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+
+@app.post("/login")
+def login(data: LoginRequest):
+    user = authenticate_user(data.username, data.password)
+
+    if user is not None:
+        return {"access_token": create_token(user["username"])}
+
+    return {"error": "Invalid credentials"}
+
+from backend.services.auth_service import create_user
+
+from pydantic import BaseModel
+
+class RegisterRequest(BaseModel):
+    username: str
+    password: str
+
+
+@app.post("/register")
+def register(data: RegisterRequest):
+    try:
+        create_user(data.username, data.password)
+        return {"status": "user created"}
+    except Exception as e:
+        return {"error": str(e)}  # show real error
+
 @app.get("/income")
-def get_income(month: Optional[str] = Query(None)):
+def get_income(month: Optional[str] = Query(None), user: str = Depends(verify_token)):
     df = get_all_income()
 
     if month:
@@ -48,7 +83,7 @@ def get_income(month: Optional[str] = Query(None)):
 
 
 @app.post("/income")
-def create_income(income: IncomeCreate):
+def create_income(income: IncomeCreate, user: str = Depends(verify_token)):
     add_income(
         income.date,
         income.source,
@@ -59,7 +94,7 @@ def create_income(income: IncomeCreate):
     return {"status": "created"}
 
 @app.put("/income/{income_id}")
-def update_income_api(income_id: int, income: IncomeCreate):
+def update_income_api(income_id: int, income: IncomeCreate, user: str = Depends(verify_token)):
     from backend.services.income_service import update_income
 
     update_income(
@@ -72,12 +107,12 @@ def update_income_api(income_id: int, income: IncomeCreate):
     return {"status": "updated"}
 
 @app.delete("/income/{income_id}")
-def remove_income(income_id: int):
+def remove_income(income_id: int , user: str = Depends(verify_token)):
     delete_income([income_id])
     return {"status": "deleted"}
 
 @app.get("/expenses")
-def get_expenses(month: Optional[str] = Query(None)):
+def get_expenses(month: Optional[str] = Query(None),user: str = Depends(verify_token)):
     df = get_all_expenses()
 
     if month:
@@ -86,7 +121,7 @@ def get_expenses(month: Optional[str] = Query(None)):
     return df.to_dict(orient="records")
 
 @app.post("/expenses")
-def create_expense(expense: ExpenseCreate):
+def create_expense(expense: ExpenseCreate, user: str = Depends(verify_token)):
     add_expense(
         expense.date,
         expense.name,
@@ -98,7 +133,7 @@ def create_expense(expense: ExpenseCreate):
     return {"status": "created"}
 
 @app.put("/expenses/{expense_id}")
-def update_expense_api(expense_id: int, expense: ExpenseCreate):
+def update_expense_api(expense_id: int, expense: ExpenseCreate , user: str = Depends(verify_token)):
     from backend.services.expense_service import update_expense
 
     update_expense(
@@ -112,10 +147,10 @@ def update_expense_api(expense_id: int, expense: ExpenseCreate):
     return {"status": "updated"}
 
 @app.delete("/expenses/{expense_id}")
-def remove_expense(expense_id: int):
+def remove_expense(expense_id: int, user: str = Depends(verify_token)):
     delete_expenses([expense_id])
     return {"status": "deleted"}
 
 @app.get("/dashboard-summary")
-def dashboard_summary(month: str):
+def dashboard_summary(month: str , user: str = Depends(verify_token)):
     return get_dashboard_summary(month)

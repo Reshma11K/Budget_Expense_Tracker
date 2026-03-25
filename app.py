@@ -49,6 +49,10 @@ plt.rcParams.update({
     "legend.edgecolor": "#333333",
 })
 
+from backend.ui.styles import apply_sidebar_style
+from backend.ui.layout import sidebar
+apply_sidebar_style()
+
 # ==============================
 # DASHBOARD COLOR PALETTE
 # ==============================
@@ -62,9 +66,56 @@ COLORS = {
     "bg": "#1f2933"
 }
 
+
+# ==============================
+# 🔐 LOGIN BLOCK (PUT HERE)
+# ==============================
+if "token" not in st.session_state:
+    st.session_state["token"] = None
+
+if not st.session_state["token"]:
+    st.title("🔐 Login")
+
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
+
+    if st.button("Login"):
+        r = requests.post(
+            f"{API_URL}/login",
+            json={"username": username, "password": password}
+        )
+
+        print("STATUS:", r.status_code)
+        print("RAW RESPONSE:", r.text)
+
+        try:
+            data = r.json()
+        except Exception:
+            st.error(f"Login failed: {r.text}")
+            st.stop()
+
+        if data and "access_token" in data:
+            st.session_state["token"] = data["access_token"]
+            st.rerun()
+        else:
+            st.error("Invalid credentials")
+
+    st.stop()  # 🚨 VERY IMPORTANT
+
+
+# ==============================
+# TABS
+# ==============================
+menu = sidebar()
+
+# ==============================
+# NORMAL APP STARTS HERE
+# ==============================
+
 st.set_page_config(page_title="Household Budget App", layout="wide")
 st.title("🏠 Household Budget App")
-
+st.caption("Track. Control. Grow our money. HeHeHeeeeeeeee")
+st.divider()
 # ==============================
 # CONSTANTS
 # ==============================
@@ -96,6 +147,10 @@ BUDGET_CATEGORIES = sorted(
 # ==============================
 # LOADERS (FIXED DATE PARSING)
 # ==============================
+def auth_headers():
+    return {
+        "Authorization": f"Bearer {st.session_state['token']}"
+    }
 
 def add_budget(month, category, amount, is_recurring=False):
     execute(
@@ -259,7 +314,7 @@ def auto_apply_recurring_budgets(target_month):
 def get_income_api(month):
     r = requests.get(
         f"{API_URL}/income",
-        params={"month": month}
+        params={"month": month}, headers=auth_headers()
     )
     df = pd.DataFrame(r.json())
 
@@ -271,7 +326,7 @@ def get_income_api(month):
 def get_expenses_api(month):
     r = requests.get(
         f"{API_URL}/expenses",
-        params={"month": month}
+        params={"month": month}, headers=auth_headers()
     )
     df = pd.DataFrame(r.json())
 
@@ -281,20 +336,20 @@ def get_expenses_api(month):
     return df
 
 def create_income_api(payload: dict):
-    r = requests.post(f"{API_URL}/income", json=payload)
+    r = requests.post(f"{API_URL}/income", json=payload, headers=auth_headers())
     r.raise_for_status()
     return r.json()
 
 
 def create_expense_api(payload: dict):
-    r = requests.post(f"{API_URL}/expenses", json=payload)
+    r = requests.post(f"{API_URL}/expenses", json=payload, headers=auth_headers())
     r.raise_for_status()
     return r.json()
 
 def get_dashboard_summary_api(month):
     r = requests.get(
         f"{API_URL}/dashboard-summary",
-        params={"month": month}
+        params={"month": month}, headers=auth_headers()
     )
     return r.json()
 
@@ -307,16 +362,9 @@ if "active_month" not in st.session_state:
     )
 
 # ==============================
-# TABS (UNCHANGED)
-# ==============================
-tab_dashboard, tab_income, tab_expense, tab_recurring, tab_budget, tab_log = st.tabs(
-    ["📊 Dashboard", "💰 Income", "🧾 Expenses", "🔁 Recurring", "📋 Budget", "📄 Log"]
-)
-
-# ==============================
 # INCOME TAB (ADDED TABLE)
 # ==============================
-with tab_income:
+if menu == "Income":
     st.subheader("Add Income")
     with st.form("income_form", clear_on_submit=True):
         d = st.date_input("Date", value=date.today(), key="income_date")
@@ -395,19 +443,19 @@ with tab_income:
                         "category": r["category"],
                         "amount": r["amount"],
                         "income_type": "One-time"
-                    }
+                    }, headers=auth_headers()
                 )
             st.rerun()
 
         if st.button("Delete Selected Income", key="delete_income"):
             for id in edited.loc[edited["Delete"], "id"]:
-                requests.delete(f"{API_URL}/income/{id}")
+                requests.delete(f"{API_URL}/income/{id}", headers=auth_headers())
             st.rerun()
 
 # ==============================
 # EXPENSE TAB (VARIABLE + TABLE)
 # ==============================
-with tab_expense:
+if menu == "Expenses":
     st.subheader("Add Variable Expense")
     with st.form("expense_form", clear_on_submit=True):
         d = st.date_input("Date", value=date.today(), key="expense_date")
@@ -476,19 +524,19 @@ with tab_expense:
                         "amount": r["amount"],
                         "payment_method": r["payment_method"],
                         "expense_type": "Variable"
-                    }
+                    }, headers=auth_headers()
                 )
             st.rerun()
 
         if st.button("Delete Selected Expenses", key="delete_expense"):
             for id in edited.loc[edited["Delete"], "id"]:
-                requests.delete(f"{API_URL}/expenses/{id}")
+                requests.delete(f"{API_URL}/expenses/{id}", headers=auth_headers())
             st.rerun()
 
 # ==============================
 # RECURRING TAB (UNCHANGED + TABLE)
 # ==============================
-with tab_recurring:
+if menu == "Recurring":
     st.subheader("Add Recurring Expense")
     with st.form("recurring_form", clear_on_submit=True):
         d = st.date_input("Start Date", value=date.today(), key="recurring_date")
@@ -556,21 +604,21 @@ with tab_recurring:
                         "amount": r["amount"],
                         "payment_method": r["payment_method"],
                         "expense_type": "Recurring"
-                    }
+                    }, headers=auth_headers()
                 )
             st.rerun()
 
         if st.button("Delete Selected Recurring", key="delete_recurring"):
             for id in edited.loc[edited["Delete"], "id"]:
-                requests.delete(f"{API_URL}/expenses/{id}")
+                requests.delete(f"{API_URL}/expenses/{id}", headers=auth_headers())
             st.rerun()
 
 # ==============================
 # DASHBOARD
 # ==============================
-with tab_dashboard:
-    income_df = get_all_income()
-    expense_df = get_all_expenses()
+if menu == "Dashboard":
+    income_df = get_income_api(get_active_month())
+    expense_df = get_expenses_api(get_active_month())
 
     # ----- Month selection (ALWAYS visible) -----
     existing_months = set(income_df.get("Month", [])).union(
@@ -789,7 +837,7 @@ with tab_dashboard:
 # ==============================
 # BUDGET TAB
 # ==============================
-with tab_budget:
+if menu == "Budget":
     month = st.session_state.get("active_month")
 
     if not month:
@@ -912,7 +960,7 @@ with tab_budget:
 # ==============================
 # LOG TAB (ORIGINAL BEHAVIOR PRESERVED)
 # ==============================
-with tab_log:
+if menu == "Log":
     st.subheader("Income Log")
     inc = get_all_income()
     if not inc.empty:
