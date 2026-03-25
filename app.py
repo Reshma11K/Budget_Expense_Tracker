@@ -53,6 +53,10 @@ from backend.ui.styles import apply_sidebar_style
 from backend.ui.layout import sidebar
 apply_sidebar_style()
 
+from backend.ui.filters import apply_expense_filters
+from backend.ui.filters import apply_income_filters
+from backend.ui.filters import apply_recurring_filters
+
 # ==============================
 # DASHBOARD COLOR PALETTE
 # ==============================
@@ -353,6 +357,25 @@ def get_dashboard_summary_api(month):
     )
     return r.json()
 
+def apply_income_filters(df):
+    if df.empty:
+        return df
+
+    col1, col2 = st.columns(2)
+
+    source = col1.text_input("Search Source")
+    category = col2.multiselect(
+        "Category",
+        options=sorted(df["category"].dropna().unique())
+    )
+
+    if source:
+        df = df[df["source"].str.contains(source, case=False, na=False)]
+
+    if category:
+        df = df[df["category"].isin(category)]
+
+    return df
 # ==============================
 # GLOBAL ACTIVE MONTH INIT
 # ==============================
@@ -395,6 +418,8 @@ if menu == "Income":
     active_month = get_active_month()
 
     df = get_income_api(active_month)
+    with st.expander("🔎 Filters", expanded=False):
+        df = apply_income_filters(df)
 
     # keep id separately for DB actions
     ids = df["id"]
@@ -481,6 +506,9 @@ if menu == "Expenses":
     df = get_expenses_api(active_month)
     df = df[df["expense_type"] == "Variable"]
 
+    with st.expander("🔎 Filters", expanded=False):
+        df = apply_expense_filters(df)
+
     ids = df["id"]
     df = df.drop(columns=["id", "expense_type"])
 
@@ -561,6 +589,8 @@ if menu == "Recurring":
     active_month = get_active_month()
     df = get_expenses_api(active_month)
     df = df[df["expense_type"] == "Recurring"]
+    with st.expander("🔎 Filters", expanded=False):
+        df = apply_recurring_filters(df)
 
     ids = df["id"]
     df = df.drop(columns=["id", "expense_type"])

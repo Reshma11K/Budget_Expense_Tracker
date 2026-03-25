@@ -4,14 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="54592e58-93b8-4572-b018-559b60e49bb7" name="Changes" comment="CRUD working">
-      <change afterPath="$PROJECT_DIR$/backend/auth.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/services/auth_service.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/ui/layout.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/ui/styles.py" afterDir="false" />
+    <list default="true" id="54592e58-93b8-4572-b018-559b60e49bb7" name="Changes" comment="Sidebar navigation">
+      <change afterPath="$PROJECT_DIR$/backend/ui/filters.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -346,7 +342,15 @@
       <option name="project" value="LOCAL" />
       <updated>1774358549823</updated>
     </task>
-    <option name="localTasksCounter" value="33" />
+    <task id="LOCAL-00033" summary="Sidebar navigation">
+      <option name="closed" value="true" />
+      <created>1774456094512</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1774456094512</updated>
+    </task>
+    <option name="localTasksCounter" value="34" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -411,6 +415,7 @@
     <MESSAGE value="All forms resetting correctly" />
     <MESSAGE value="Insert via API" />
     <MESSAGE value="CRUD working" />
-    <option name="LAST_COMMIT_MESSAGE" value="CRUD working" />
+    <MESSAGE value="Sidebar navigation" />
+    <option name="LAST_COMMIT_MESSAGE" value="Sidebar navigation" />
   </component>
 </project>
