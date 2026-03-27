@@ -7,6 +7,35 @@ from datetime import date
 from db import load_df, execute
 import matplotlib.pyplot as plt
 
+import requests
+
+API_URL = "http://127.0.0.1:8000"
+
+
+from backend.services.income_service import (
+    get_all_income,
+    add_income,
+    update_income,
+    delete_income,
+    auto_apply_recurring_income,
+)
+
+from backend.services.expense_service import (
+    get_all_expenses,
+    add_expense,
+    update_expense,
+    delete_expenses,
+    auto_apply_recurring_expenses,
+)
+
+from backend.services.budget_service import (
+    get_budgets_for_month,
+    add_or_update_budget,
+    update_budget,
+    delete_budgets,
+    auto_apply_recurring_budgets,
+)
+
 plt.rcParams.update({
     "figure.facecolor": "#111111",
     "axes.facecolor": "#1a1a1a",
@@ -19,6 +48,14 @@ plt.rcParams.update({
     "legend.facecolor": "#1a1a1a",
     "legend.edgecolor": "#333333",
 })
+
+from backend.ui.styles import apply_sidebar_style
+from backend.ui.layout import sidebar
+apply_sidebar_style()
+
+from backend.ui.filters import apply_expense_filters
+from backend.ui.filters import apply_income_filters
+from backend.ui.filters import apply_recurring_filters
 
 # ==============================
 # DASHBOARD COLOR PALETTE
@@ -33,9 +70,56 @@ COLORS = {
     "bg": "#1f2933"
 }
 
+
+# ==============================
+# 🔐 LOGIN BLOCK (PUT HERE)
+# ==============================
+if "token" not in st.session_state:
+    st.session_state["token"] = None
+
+if not st.session_state["token"]:
+    st.title("🔐 Login")
+
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
+
+    if st.button("Login"):
+        r = requests.post(
+            f"{API_URL}/login",
+            json={"username": username, "password": password}
+        )
+
+        print("STATUS:", r.status_code)
+        print("RAW RESPONSE:", r.text)
+
+        try:
+            data = r.json()
+        except Exception:
+            st.error(f"Login failed: {r.text}")
+            st.stop()
+
+        if data and "access_token" in data:
+            st.session_state["token"] = data["access_token"]
+            st.rerun()
+        else:
+            st.error("Invalid credentials")
+
+    st.stop()  # 🚨 VERY IMPORTANT
+
+
+# ==============================
+# TABS
+# ==============================
+menu = sidebar()
+
+# ==============================
+# NORMAL APP STARTS HERE
+# ==============================
+
 st.set_page_config(page_title="Household Budget App", layout="wide")
 st.title("🏠 Household Budget App")
-
+st.caption("Track. Control. Grow our money. HeHeHeeeeeeeee")
+st.divider()
 # ==============================
 # CONSTANTS
 # ==============================
@@ -48,7 +132,7 @@ EXPENSE_CATEGORIES = [
 ]
 
 RECURRING_CATEGORIES = [
-    "Rent", "Transport", "Internet", "Electricity",
+    "Rent", "Transport", "Internet", "Mobile charges", "Electricity",
     "Insurance", "Scalable Savings", "Other"
 ]
 
@@ -67,23 +151,10 @@ BUDGET_CATEGORIES = sorted(
 # ==============================
 # LOADERS (FIXED DATE PARSING)
 # ==============================
-def load_income():
-    df = load_df("SELECT * FROM income ORDER BY date DESC")
-    if df.empty:
-        df["Month"] = []
-        return df
-    df["date"] = pd.to_datetime(df["date"], format="mixed")
-    df["Month"] = df["date"].dt.to_period("M").astype(str)
-    return df
-
-def load_expenses():
-    df = load_df("SELECT * FROM expenses ORDER BY date DESC")
-    if df.empty:
-        df["Month"] = []
-        return df
-    df["date"] = pd.to_datetime(df["date"], format="mixed")
-    df["Month"] = df["date"].dt.to_period("M").astype(str)
-    return df
+def auth_headers():
+    return {
+        "Authorization": f"Bearer {st.session_state['token']}"
+    }
 
 def add_budget(month, category, amount, is_recurring=False):
     execute(
@@ -98,14 +169,30 @@ def add_budget(month, category, amount, is_recurring=False):
         (month, category, amount, is_recurring)
     )
 
-def get_month_options(existing_months, future_months=6):
+def get_month_options(existing_months):
     """
-    Returns a sorted list of YYYY-MM months including existing
-    months and N future months.
+    Returns:
+    - All months from Jan of current year → current month
+    - Next month
+    - Keeps existing months (safe if DB has data)
     """
-    today = pd.Timestamp.today().to_period("M")
-    future = [str(today + i) for i in range(future_months + 1)]
-    return sorted(set(existing_months).union(future))
+    today = pd.Timestamp.today()
+    current_period = today.to_period("M")
+
+    # All months from Jan → current month (same year)
+    year_start = pd.Period(f"{today.year}-01", freq="M")
+    months = {
+        str(year_start + i)
+        for i in range(current_period.month)
+    }
+
+    # Add next month
+    months.add(str(current_period + 1))
+
+    # Merge with DB months (defensive, future-proof)
+    months |= set(existing_months)
+
+    return sorted(months)
 
 def get_default_month_index(months):
     current_month = str(pd.Timestamp.today().to_period("M"))
@@ -228,6 +315,67 @@ def auto_apply_recurring_budgets(target_month):
 
     return added
 
+def get_income_api(month):
+    r = requests.get(
+        f"{API_URL}/income",
+        params={"month": month}, headers=auth_headers()
+    )
+    df = pd.DataFrame(r.json())
+
+    if not df.empty:
+        df["date"] = pd.to_datetime(df["date"])
+
+    return df
+
+def get_expenses_api(month):
+    r = requests.get(
+        f"{API_URL}/expenses",
+        params={"month": month}, headers=auth_headers()
+    )
+    df = pd.DataFrame(r.json())
+
+    if not df.empty:
+        df["date"] = pd.to_datetime(df["date"])
+
+    return df
+
+def create_income_api(payload: dict):
+    r = requests.post(f"{API_URL}/income", json=payload, headers=auth_headers())
+    r.raise_for_status()
+    return r.json()
+
+
+def create_expense_api(payload: dict):
+    r = requests.post(f"{API_URL}/expenses", json=payload, headers=auth_headers())
+    r.raise_for_status()
+    return r.json()
+
+def get_dashboard_summary_api(month):
+    r = requests.get(
+        f"{API_URL}/dashboard-summary",
+        params={"month": month}, headers=auth_headers()
+    )
+    return r.json()
+
+def apply_income_filters(df):
+    if df.empty:
+        return df
+
+    col1, col2 = st.columns(2)
+
+    source = col1.text_input("Search Source")
+    category = col2.multiselect(
+        "Category",
+        options=sorted(df["category"].dropna().unique())
+    )
+
+    if source:
+        df = df[df["source"].str.contains(source, case=False, na=False)]
+
+    if category:
+        df = df[df["category"].isin(category)]
+
+    return df
 # ==============================
 # GLOBAL ACTIVE MONTH INIT
 # ==============================
@@ -237,37 +385,41 @@ if "active_month" not in st.session_state:
     )
 
 # ==============================
-# TABS (UNCHANGED)
-# ==============================
-tab_dashboard, tab_income, tab_expense, tab_recurring, tab_budget, tab_log = st.tabs(
-    ["📊 Dashboard", "💰 Income", "🧾 Expenses", "🔁 Recurring", "📋 Budget", "📄 Log"]
-)
-
-# ==============================
 # INCOME TAB (ADDED TABLE)
 # ==============================
-with tab_income:
+if menu == "Income":
     st.subheader("Add Income")
-    with st.form("income_form"):
-        d = st.date_input("Date", value=date.today())
-        source = st.text_input("Income Source")
-        category = st.selectbox("Category", INCOME_CATEGORIES)
-        amount = st.number_input("Amount", min_value=0.0)
+    with st.form("income_form", clear_on_submit=True):
+        d = st.date_input("Date", value=date.today(), key="income_date")
+        source = st.text_input("Income Source", key="income_source")
+        category = st.selectbox("Category", INCOME_CATEGORIES, key="income_category")
+        amount = st.number_input("Amount", min_value=0.0, key="income_amount")
+
         income_type = st.selectbox(
             "Income Type",
-            ["One-time", "Recurring"]
+            ["One-time", "Recurring"],
+            key="income_type"
         )
+
         if st.form_submit_button("Add Income"):
-            execute(
-                "INSERT INTO income (date, source, category, amount, income_type) VALUES (%s,%s,%s,%s,%s)",
-                (d, source, category, amount, income_type)
-            )
+            create_income_api({
+                "date": str(d),
+                "source": source,
+                "category": category,
+                "amount": amount,
+                "income_type": income_type
+            })
+
+
+
             st.rerun()
 
     st.divider()
     active_month = get_active_month()
-    df = load_income()
-    df = df[df["Month"] == active_month]
+
+    df = get_income_api(active_month)
+    with st.expander("🔎 Filters", expanded=False):
+        df = apply_income_filters(df)
 
     # keep id separately for DB actions
     ids = df["id"]
@@ -308,46 +460,54 @@ with tab_income:
 
         if st.button("Save Income Changes", key="save_income"):
             for _, r in edited.iterrows():
-                execute(
-                    "UPDATE income SET date=%s, source=%s, category=%s, amount=%s, income_type=%s WHERE id=%s",
-                    (r["date"], r["source"], r["category"], r["amount"], r["income_type"], r["id"])
+                requests.put(
+                    f"{API_URL}/income/{r['id']}",
+                    json={
+                        "date": str(r["date"]),
+                        "source": r["source"],
+                        "category": r["category"],
+                        "amount": r["amount"],
+                        "income_type": "One-time"
+                    }, headers=auth_headers()
                 )
             st.rerun()
 
         if st.button("Delete Selected Income", key="delete_income"):
-            execute(
-                "DELETE FROM income WHERE id = ANY(%s)",
-                (edited.loc[edited["Delete"], "id"].tolist(),)
-            )
+            for id in edited.loc[edited["Delete"], "id"]:
+                requests.delete(f"{API_URL}/income/{id}", headers=auth_headers())
             st.rerun()
 
 # ==============================
 # EXPENSE TAB (VARIABLE + TABLE)
 # ==============================
-with tab_expense:
+if menu == "Expenses":
     st.subheader("Add Variable Expense")
-    with st.form("expense_form"):
-        d = st.date_input("Date", value=date.today())
-        name = st.text_input("Expense Name")
-        category = st.selectbox("Category", EXPENSE_CATEGORIES)
-        payment = st.selectbox("Payment Method", PAYMENT_METHODS)
-        amount = st.number_input("Amount", min_value=0.0)
+    with st.form("expense_form", clear_on_submit=True):
+        d = st.date_input("Date", value=date.today(), key="expense_date")
+        name = st.text_input("Expense Name", key="expense_name")
+        category = st.selectbox("Category", EXPENSE_CATEGORIES, key="expense_category")
+        payment = st.selectbox("Payment Method", PAYMENT_METHODS, key="expense_payment")
+        amount = st.number_input("Amount", min_value=0.0, key="expense_amount")
+
         if st.form_submit_button("Add Expense"):
-            execute(
-                """INSERT INTO expenses
-                   (date, name, category, amount, payment_method, expense_type)
-                   VALUES (%s,%s,%s,%s,%s,'Variable')""",
-                (d, name, category, amount, payment)
-            )
+            create_expense_api({
+                "date": str(d),
+                "name": name,
+                "category": category,
+                "amount": amount,
+                "payment_method": payment,
+                "expense_type": "Variable"
+            })
+
             st.rerun()
 
     st.divider()
     active_month = get_active_month()
-    df = load_expenses()
-    df = df[
-        (df["expense_type"] == "Variable") &
-        (df["Month"] == active_month)
-        ]
+    df = get_expenses_api(active_month)
+    df = df[df["expense_type"] == "Variable"]
+
+    with st.expander("🔎 Filters", expanded=False):
+        df = apply_expense_filters(df)
 
     ids = df["id"]
     df = df.drop(columns=["id", "expense_type"])
@@ -383,49 +543,54 @@ with tab_expense:
 
         if st.button("Save Expense Changes", key="save_expense"):
             for _, r in edited.iterrows():
-                execute(
-                    """UPDATE expenses
-                       SET date=%s, name=%s, category=%s, amount=%s, payment_method=%s
-                       WHERE id=%s""",
-                    (r["date"], r["name"], r["category"],
-                     r["amount"], r["payment_method"], r["id"])
+                requests.put(
+                    f"{API_URL}/expenses/{r['id']}",
+                    json={
+                        "date": str(r["date"]),
+                        "name": r["name"],
+                        "category": r["category"],
+                        "amount": r["amount"],
+                        "payment_method": r["payment_method"],
+                        "expense_type": "Variable"
+                    }, headers=auth_headers()
                 )
             st.rerun()
 
         if st.button("Delete Selected Expenses", key="delete_expense"):
-            execute(
-                "DELETE FROM expenses WHERE id = ANY(%s)",
-                (edited.loc[edited["Delete"], "id"].tolist(),)
-            )
+            for id in edited.loc[edited["Delete"], "id"]:
+                requests.delete(f"{API_URL}/expenses/{id}", headers=auth_headers())
             st.rerun()
 
 # ==============================
 # RECURRING TAB (UNCHANGED + TABLE)
 # ==============================
-with tab_recurring:
+if menu == "Recurring":
     st.subheader("Add Recurring Expense")
-    with st.form("recurring_form"):
-        d = st.date_input("Start Date", value=date.today())
-        name = st.text_input("Name")
-        category = st.selectbox("Category", RECURRING_CATEGORIES)
-        payment = st.selectbox("Payment Method", PAYMENT_METHODS)
-        amount = st.number_input("Amount", min_value=0.0)
+    with st.form("recurring_form", clear_on_submit=True):
+        d = st.date_input("Start Date", value=date.today(), key="recurring_date")
+        name = st.text_input("Name", key="recurring_name")
+        category = st.selectbox("Category", RECURRING_CATEGORIES, key="recurring_category")
+        payment = st.selectbox("Payment Method", PAYMENT_METHODS, key="recurring_payment")
+        amount = st.number_input("Amount", min_value=0.0, key="recurring_amount")
+
         if st.form_submit_button("Save Recurring"):
-            execute(
-                """INSERT INTO expenses
-                   (date, name, category, amount, payment_method, expense_type)
-                   VALUES (%s,%s,%s,%s,%s,'Recurring')""",
-                (d, name, category, amount, payment)
-            )
+            create_expense_api({
+                "date": str(d),
+                "name": name,
+                "category": category,
+                "amount": amount,
+                "payment_method": payment,
+                "expense_type": "Recurring"
+            })
+
             st.rerun()
 
     st.divider()
     active_month = get_active_month()
-    df = load_expenses()
-    df = df[
-        (df["expense_type"] == "Recurring") &
-        (df["Month"] == active_month)
-        ]
+    df = get_expenses_api(active_month)
+    df = df[df["expense_type"] == "Recurring"]
+    with st.expander("🔎 Filters", expanded=False):
+        df = apply_recurring_filters(df)
 
     ids = df["id"]
     df = df.drop(columns=["id", "expense_type"])
@@ -460,35 +625,37 @@ with tab_recurring:
 
         if st.button("Save Recurring Changes", key="save_recurring"):
             for _, r in edited.iterrows():
-                execute(
-                    """UPDATE expenses
-                       SET date=%s, name=%s, category=%s, amount=%s, payment_method=%s
-                       WHERE id=%s""",
-                    (r["date"], r["name"], r["category"],
-                     r["amount"], r["payment_method"], r["id"])
+                requests.put(
+                    f"{API_URL}/expenses/{r['id']}",
+                    json={
+                        "date": str(r["date"]),
+                        "name": r["name"],
+                        "category": r["category"],
+                        "amount": r["amount"],
+                        "payment_method": r["payment_method"],
+                        "expense_type": "Recurring"
+                    }, headers=auth_headers()
                 )
             st.rerun()
 
         if st.button("Delete Selected Recurring", key="delete_recurring"):
-            execute(
-                "DELETE FROM expenses WHERE id = ANY(%s)",
-                (edited.loc[edited["Delete"], "id"].tolist(),)
-            )
+            for id in edited.loc[edited["Delete"], "id"]:
+                requests.delete(f"{API_URL}/expenses/{id}", headers=auth_headers())
             st.rerun()
 
 # ==============================
 # DASHBOARD
 # ==============================
-with tab_dashboard:
-    income_df = load_income()
-    expense_df = load_expenses()
+if menu == "Dashboard":
+    income_df = get_income_api(get_active_month())
+    expense_df = get_expenses_api(get_active_month())
 
     # ----- Month selection (ALWAYS visible) -----
     existing_months = set(income_df.get("Month", [])).union(
         set(expense_df.get("Month", []))
     )
 
-    months = get_month_options(existing_months, future_months=6)
+    months = get_month_options(existing_months)
     default_index = get_default_month_index(months)
 
     month = st.selectbox(
@@ -511,12 +678,12 @@ with tab_dashboard:
 
     # ----- Auto-apply recurring income / expenses -----
     added_inc = auto_apply_recurring_income(income_df, month)
-    added_exp = auto_apply_recurring(expense_df, month)
+    added_exp = auto_apply_recurring_expenses(expense_df, month)
 
     if added_inc:
-        income_df = load_income()
+        income_df = get_all_income()
     if added_exp:
-        expense_df = load_expenses()
+        expense_df = get_all_expenses()
 
     # ----- If still no data, stop after selector -----
     if income_df.empty and expense_df.empty:
@@ -525,16 +692,18 @@ with tab_dashboard:
     # ==============================
     # KPIs
     # ==============================
-    income_total = income_df[income_df["Month"] == month]["amount"].sum()
-    expense_total = expense_df[expense_df["Month"] == month]["amount"].sum()
-    balance = income_total - expense_total
+    summary = get_dashboard_summary_api(month)
+
+    income_total = summary["income_total"]
+    expense_total = summary["expense_total"]
+    balance = summary["balance"]
 
     c1, c2, c3 = st.columns(3)
-    c1.metric("Income", f"${income_total:,.2f}")
-    c2.metric("Expenses", f"${expense_total:,.2f}")
+    c1.metric("Income", f"€{income_total:,.2f}")
+    c2.metric("Expenses", f"€{expense_total:,.2f}")
     c3.metric(
         "Balance",
-        f"${balance:,.2f}",
+        f"€{balance:,.2f}",
         delta_color="inverse" if balance < 0 else "normal"
     )
 
@@ -698,7 +867,7 @@ with tab_dashboard:
 # ==============================
 # BUDGET TAB
 # ==============================
-with tab_budget:
+if menu == "Budget":
     month = st.session_state.get("active_month")
 
     if not month:
@@ -710,9 +879,9 @@ with tab_budget:
     # ------------------------------
     # Add / Update Budget Form
     # ------------------------------
-    with st.form("budget_form"):
-        category = st.selectbox("Category", BUDGET_CATEGORIES)
-        amount = st.number_input("Budget Amount", min_value=0.0)
+    with st.form("budget_form", clear_on_submit=True):
+        category = st.selectbox("Category", BUDGET_CATEGORIES, key="budget_category")
+        amount = st.number_input("Budget Amount", min_value=0.0, key="budget_amount")
 
         is_recurring = st.checkbox(
             "🔁 Recurring budget (auto-applies every month)",
@@ -721,6 +890,7 @@ with tab_budget:
 
         if st.form_submit_button("Save Budget"):
             add_budget(month, category, amount, is_recurring)
+
             st.rerun()
 
     st.divider()
@@ -728,16 +898,9 @@ with tab_budget:
     # ------------------------------
     # Load budgets + actuals
     # ------------------------------
-    budgets = load_df(
-        """
-        SELECT month, category, budget, is_recurring
-        FROM budgets
-        WHERE month=%s
-        """,
-        (month,)
-    )
+    budgets = get_budgets_for_month(month)
 
-    expense_df = load_expenses()
+    expense_df = get_all_expenses()
     expense_df = expense_df[expense_df["Month"] == month]
 
     if budgets.empty:
@@ -799,13 +962,11 @@ with tab_budget:
     with col1:
         if st.button("💾 Save Budget Changes"):
             for _, r in edited.iterrows():
-                execute(
-                    """
-                    UPDATE budgets
-                    SET budget=%s, is_recurring=%s
-                    WHERE month=%s AND category=%s
-                    """,
-                    (r["budget"], r["is_recurring"], month, r["category"])
+                update_budget(
+                    month,
+                    r["category"],
+                    r["budget"],
+                    r["is_recurring"]
                 )
             st.success("Budgets updated")
             st.rerun()
@@ -822,22 +983,16 @@ with tab_budget:
             if not to_delete:
                 st.warning("No budgets selected for deletion.")
             else:
-                execute(
-                    """
-                    DELETE FROM budgets
-                    WHERE month=%s AND category = ANY(%s)
-                    """,
-                    (month, to_delete)
-                )
+                delete_budgets(month, to_delete)
                 st.success("Selected budgets deleted")
                 st.rerun()
 
 # ==============================
 # LOG TAB (ORIGINAL BEHAVIOR PRESERVED)
 # ==============================
-with tab_log:
+if menu == "Log":
     st.subheader("Income Log")
-    inc = load_income()
+    inc = get_all_income()
     if not inc.empty:
         edited = st.data_editor(inc, use_container_width=True, key="log_income")
         if st.button("Save Income Changes", key="log_save_income"):
@@ -849,7 +1004,7 @@ with tab_log:
             st.rerun()
 
     st.subheader("Expense Log")
-    exp = load_expenses()
+    exp = get_all_expenses()
     if not exp.empty:
         edited = st.data_editor(exp, use_container_width=True, key="log_expense")
         if st.button("Save Expense Changes", key="log_save_expense"):

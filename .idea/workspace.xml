@@ -4,7 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="54592e58-93b8-4572-b018-559b60e49bb7" name="Changes" comment="updates to show budget table">
+    <list default="true" id="54592e58-93b8-4572-b018-559b60e49bb7" name="Changes" comment="Sidebar navigation">
+      <change afterPath="$PROJECT_DIR$/backend/ui/filters.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
     </list>
@@ -44,6 +45,9 @@
     &quot;accountId&quot;: &quot;0fdfae05-8760-4673-acf1-d15d5efe2091&quot;
   }
 }</component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/app.py" root0="FORCE_HIGHLIGHTING" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 8
 }</component>
@@ -58,10 +62,15 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;dev&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;
   }
 }</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\PythonProjects\Budget_Expense_Tracker\backend\services" />
+    </key>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -245,15 +254,138 @@
       <option name="project" value="LOCAL" />
       <updated>1772122876509</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="updates to show budget table">
+      <option name="closed" value="true" />
+      <created>1772183426119</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1772183426119</updated>
+    </task>
+    <task id="LOCAL-00023" summary="updated month picker in dashboard">
+      <option name="closed" value="true" />
+      <created>1772455338022</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1772455338022</updated>
+    </task>
+    <task id="LOCAL-00024" summary="updated month picker in dashboard">
+      <option name="closed" value="true" />
+      <created>1772471174258</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1772471174258</updated>
+    </task>
+    <task id="LOCAL-00025" summary="clean service layer">
+      <option name="closed" value="true" />
+      <created>1772554408949</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1772554408949</updated>
+    </task>
+    <task id="LOCAL-00026" summary="Created a minimal API server">
+      <option name="closed" value="true" />
+      <created>1772554644035</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1772554644035</updated>
+    </task>
+    <task id="LOCAL-00027" summary="updated main.py">
+      <option name="closed" value="true" />
+      <created>1772558982181</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1772558982181</updated>
+    </task>
+    <task id="LOCAL-00028" summary="updated dashboard_service.py">
+      <option name="closed" value="true" />
+      <created>1774282001947</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1774282001947</updated>
+    </task>
+    <task id="LOCAL-00029" summary="Income (read) → API">
+      <option name="closed" value="true" />
+      <created>1774283193843</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1774283193843</updated>
+    </task>
+    <task id="LOCAL-00030" summary="All forms resetting correctly">
+      <option name="closed" value="true" />
+      <created>1774288324376</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1774288324376</updated>
+    </task>
+    <task id="LOCAL-00031" summary="Insert via API">
+      <option name="closed" value="true" />
+      <created>1774352898780</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1774352898780</updated>
+    </task>
+    <task id="LOCAL-00032" summary="CRUD working">
+      <option name="closed" value="true" />
+      <created>1774358549823</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1774358549823</updated>
+    </task>
+    <task id="LOCAL-00033" summary="Sidebar navigation">
+      <option name="closed" value="true" />
+      <created>1774456094512</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1774456094512</updated>
+    </task>
+    <option name="localTasksCounter" value="34" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
+    <option name="RECENT_FILTERS">
+      <map>
+        <entry key="Branch">
+          <value>
+            <list>
+              <RecentGroup>
+                <option name="FILTER_VALUES">
+                  <option value="origin/dev_KPI" />
+                </option>
+              </RecentGroup>
+            </list>
+          </value>
+        </entry>
+      </map>
+    </option>
     <option name="TAB_STATES">
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="origin/dev_KPI" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
           </value>
         </entry>
       </map>
@@ -274,6 +406,16 @@
     <MESSAGE value="Recurring income and expenses auto-apply. Month picker in dashboard." />
     <MESSAGE value="Merge remote-tracking branch 'origin/master'&#10;&#10;# Conflicts:&#10;#&#9;.idea/workspace.xml&#10;#&#9;app.py" />
     <MESSAGE value="updates to show budget table" />
-    <option name="LAST_COMMIT_MESSAGE" value="updates to show budget table" />
+    <MESSAGE value="updated month picker in dashboard" />
+    <MESSAGE value="clean service layer" />
+    <MESSAGE value="Created a minimal API server" />
+    <MESSAGE value="updated main.py" />
+    <MESSAGE value="updated dashboard_service.py" />
+    <MESSAGE value="Income (read) → API" />
+    <MESSAGE value="All forms resetting correctly" />
+    <MESSAGE value="Insert via API" />
+    <MESSAGE value="CRUD working" />
+    <MESSAGE value="Sidebar navigation" />
+    <option name="LAST_COMMIT_MESSAGE" value="Sidebar navigation" />
   </component>
 </project>
