@@ -1,0 +1,76 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #0f172a;
+  color: #e5e7eb;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 220px;
+  background-color: #020617;
+  padding: 20px;
+  height: 100vh;
+  border-right: 1px solid #1f2937;
+}
+
+.sidebar h3 {
+  margin-bottom: 20px;
+}
+
+.sidebar p {
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 6px;
+}
+
+.sidebar p:hover {
+  background-color: #1e293b;
+}
+
+/* Main content */
+.main {
+  flex: 1;
+  padding: 25px;
+}
+
+/* Card */
+.card {
+  background-color: #020617;
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid #1f2937;
+}
+
+/* Filters */
+.filters select,
+.filters input {
+  margin-right: 10px;
+  padding: 6px;
+  background-color: #020617;
+  color: white;
+  border: 1px solid #334155;
+  border-radius: 5px;
+}
+
+/* Table */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+th {
+  text-align: left;
+  border-bottom: 1px solid #374151;
+  padding: 10px;
+}
+
+td {
+  padding: 10px;
+  border-bottom: 1px solid #1f2937;
+}
+
+tr:hover {
+  background-color: #1e293b;
+}

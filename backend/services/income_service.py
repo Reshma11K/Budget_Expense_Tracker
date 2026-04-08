@@ -1,5 +1,5 @@
 import pandas as pd
-from db import load_df, execute
+from backend.db import load_df, execute
 
 
 def get_all_income():
