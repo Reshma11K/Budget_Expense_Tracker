@@ -1,5 +1,5 @@
 from passlib.context import CryptContext
-from db import load_df, execute
+from backend.db import load_df, execute
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -36,6 +36,8 @@ def authenticate_user(username: str, password: str):
     user = df.iloc[0]
 
     if verify_password(password, user["password_hash"]):
-        return dict(user)
+        return {
+            "username": user["username"]  # ✅ clean return
+        }
 
     return None

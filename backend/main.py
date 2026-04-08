@@ -1,4 +1,7 @@
 from fastapi import FastAPI, Query, Depends
+from fastapi.middleware.cors import CORSMiddleware
+
+
 from backend.services.income_service import (
     get_all_income,
     add_income,
@@ -16,6 +19,18 @@ from backend.services.expense_service import (
 from backend.services.dashboard_service import get_dashboard_summary
 
 app = FastAPI()
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 from backend.auth import create_token, verify_token
 
@@ -46,14 +61,24 @@ class LoginRequest(BaseModel):
     password: str
 
 
+
 @app.post("/login")
 def login(data: LoginRequest):
-    user = authenticate_user(data.username, data.password)
+    try:
+        print("LOGIN ATTEMPT:", data.username)
 
-    if user is not None:
-        return {"access_token": create_token(user["username"])}
+        user = authenticate_user(data.username, data.password)
 
-    return {"error": "Invalid credentials"}
+        print("USER RESULT:", user)
+
+        if user:
+            return {"access_token": create_token(user["username"])}
+
+        return {"error": "Invalid credentials"}
+
+    except Exception as e:
+        print("🔥 LOGIN CRASH:", e)
+        return {"error": str(e)}
 
 from backend.services.auth_service import create_user
 

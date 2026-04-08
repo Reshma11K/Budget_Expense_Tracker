@@ -4,7 +4,7 @@
 import streamlit as st
 import pandas as pd
 from datetime import date
-from db import load_df, execute
+from backend.db import load_df, execute
 import matplotlib.pyplot as plt
 
 import requests
@@ -14,26 +14,17 @@ API_URL = "http://127.0.0.1:8000"
 
 from backend.services.income_service import (
     get_all_income,
-    add_income,
-    update_income,
-    delete_income,
-    auto_apply_recurring_income,
 )
 
 from backend.services.expense_service import (
     get_all_expenses,
-    add_expense,
-    update_expense,
-    delete_expenses,
     auto_apply_recurring_expenses,
 )
 
 from backend.services.budget_service import (
     get_budgets_for_month,
-    add_or_update_budget,
     update_budget,
     delete_budgets,
-    auto_apply_recurring_budgets,
 )
 
 plt.rcParams.update({
@@ -54,7 +45,6 @@ from backend.ui.layout import sidebar
 apply_sidebar_style()
 
 from backend.ui.filters import apply_expense_filters
-from backend.ui.filters import apply_income_filters
 from backend.ui.filters import apply_recurring_filters
 
 # ==============================
