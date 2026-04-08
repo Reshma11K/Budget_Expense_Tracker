@@ -2,6 +2,7 @@ import { useState } from "react";
 import Income from "./pages/Income";
 import Expenses from "./pages/Expenses";
 import Dashboard from "./pages/Dashboard";
+import Budget from "./pages/Budget";
 
 export default function App() {
 
@@ -98,6 +99,7 @@ if (!token) {
       <p onClick={() => setPage("dashboard")}>📊 Dashboard</p>
       <p onClick={() => setPage("income")}>💰 Income</p>
       <p onClick={() => setPage("expenses")}>🧾 Expenses</p>
+      <p onClick={() => setPage("budget")}>🎯 Budget</p>
 
       <br />
       <button onClick={handleLogout}>Logout</button>
@@ -109,6 +111,7 @@ if (!token) {
       {page === "dashboard" && <Dashboard />}
       {page === "income" && <Income />}
       {page === "expenses" && <Expenses />}
+      {page === "budget" && <Budget />}
 
     </div>
 

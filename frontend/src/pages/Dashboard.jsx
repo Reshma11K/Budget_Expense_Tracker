@@ -49,6 +49,11 @@ export default function Dashboard() {
   );
   const [showCorpusEdit, setShowCorpusEdit] = useState(false);
 
+  // 🎯 BUDGETS
+  const [budgets] = useState(
+    JSON.parse(localStorage.getItem("budgets")) || {}
+  );
+
   useEffect(() => {
     localStorage.setItem("corpus", corpus);
   }, [corpus]);
@@ -95,7 +100,6 @@ export default function Dashboard() {
   const totalExpenses = expenses.reduce((s, e) => s + e.amount, 0);
   const balance = totalIncome - totalExpenses;
 
-  // ✅ FIXED TOTAL
   const previousMonths = trendData.filter(m => m.month < month);
 
   const previousSavings = previousMonths.reduce((sum, m) => {
@@ -105,7 +109,7 @@ export default function Dashboard() {
   const totalBalance = corpus + previousSavings + balance;
 
   // ==============================
-  // 🔮 FIXED PREDICTION
+  // 🔮 PREDICTION
   // ==============================
   const recurringExpenses = expenses.filter(
     (e) => e.expense_type === "Recurring"
@@ -139,14 +143,30 @@ export default function Dashboard() {
   // ==============================
   // DATA PREP
   // ==============================
-  const weeklyData = Object.values(
-    expenses.reduce((acc, e) => {
-      const w = Math.ceil(new Date(e.date).getDate() / 7);
-      if (!acc[w]) acc[w] = { week: `W${w}`, amount: 0 };
-      acc[w].amount += e.amount;
-      return acc;
-    }, {})
-  );
+    const weeklyData = (() => {
+      const base = {
+        1: { week: "W1", amount: 0 },
+        2: { week: "W2", amount: 0 },
+        3: { week: "W3", amount: 0 },
+        4: { week: "W4", amount: 0 },
+        5: { week: "W5", amount: 0 },
+      };
+
+      expenses.forEach((e) => {
+        if (!e.date) return;
+
+        const date = new Date(e.date);
+        if (isNaN(date)) return;
+
+        const week = Math.ceil(date.getDate() / 7);
+
+        if (base[week]) {
+          base[week].amount += Number(e.amount) || 0;
+        }
+      });
+
+      return Object.values(base);
+    })();
 
   const categoryData = Object.entries(
     expenses.reduce((acc, e) => {
@@ -174,6 +194,32 @@ export default function Dashboard() {
       wealth: runningTotal
     };
   });
+
+  // ==============================
+  // 🎯 BUDGET DATA
+  // ==============================
+    const budgetData = Object.entries(
+      expenses.reduce((acc, e) => {
+        acc[e.category] = (acc[e.category] || 0) + e.amount;
+        return acc;
+      }, {})
+    )
+    .map(([category, spent]) => {
+      const budget = budgets[category];
+
+      if (!budget || budget <= 0) return null; // ignore disabled
+
+      return {
+        category,
+        spent,
+        budget
+      };
+    })
+    .filter(Boolean);
+
+    const overBudget = budgetData.filter(
+      b => b.spent > b.budget
+    );
 
   // ==============================
   // UI
@@ -231,6 +277,43 @@ export default function Dashboard() {
           />
         )}
       </div>
+
+      {/* 🎯 Budget Status */}
+        <h3>🎯 Budget Status</h3>
+
+        {budgetData.length === 0 ? (
+          <p style={{ color: "#9ca3af" }}>
+            No budgets set. Go to Budget tab to enable tracking.
+          </p>
+        ) : overBudget.length > 0 ? (
+          <ul>
+            <li>⚠️ {overBudget.length} categories over budget</li>
+            {overBudget.slice(0, 3).map((b, i) => (
+              <li key={i}>
+                🔥 {b.category}: Over by €{(b.spent - b.budget).toFixed(0)}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>✅ All tracked categories within budget</p>
+        )}
+
+      {/* 🎯 Budget Chart */}
+        {budgetData.length > 0 && (
+          <>
+            <h3>🎯 Budget vs Actual</h3>
+
+            <BarChart width={700} height={300} data={budgetData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="category" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="budget" fill="#22c55e" />
+              <Bar dataKey="spent" fill="#ef4444" />
+            </BarChart>
+          </>
+        )}
 
       {/* CHART ROW 1 */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginTop: "20px" }}>
