@@ -9,6 +9,7 @@ export default function App() {
   // ==============================
   // 🔐 AUTH STATE
   // ==============================
+  const API_URL = "https://budget-expense-tracker-backend-0965.onrender.com";
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [page, setPage] = useState("dashboard");
 
@@ -20,7 +21,7 @@ export default function App() {
   // ==============================
   const handleLogin = async () => {
     try {
-      const res = await fetch("http://127.0.0.1:8000/login", {
+      const res = await fetch(`${API_URL}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
