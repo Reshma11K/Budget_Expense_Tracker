@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="54592e58-93b8-4572-b018-559b60e49bb7" name="Changes" comment="update- streamlit free">
+    <list default="true" id="54592e58-93b8-4572-b018-559b60e49bb7" name="Changes" comment="updated requirements">
       <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -382,7 +382,15 @@
       <option name="project" value="LOCAL" />
       <updated>1775731452883</updated>
     </task>
-    <option name="localTasksCounter" value="38" />
+    <task id="LOCAL-00038" summary="updated requirements">
+      <option name="closed" value="true" />
+      <created>1775732809163</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1775732809163</updated>
+    </task>
+    <option name="localTasksCounter" value="39" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -424,7 +432,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Added dotenv dependency" />
     <MESSAGE value="Hard coded credentials" />
     <MESSAGE value="Testing with initializing connection once" />
     <MESSAGE value="Switch to Secrets. Connect using Transacton pooler" />
@@ -449,7 +456,8 @@
     <MESSAGE value="frontend files" />
     <MESSAGE value="updated budget and dashboard for those budget changes" />
     <MESSAGE value="update- streamlit free" />
-    <option name="LAST_COMMIT_MESSAGE" value="update- streamlit free" />
+    <MESSAGE value="updated requirements" />
+    <option name="LAST_COMMIT_MESSAGE" value="updated requirements" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
