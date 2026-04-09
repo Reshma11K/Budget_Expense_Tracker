@@ -84,7 +84,7 @@ export default function Income() {
     }
 
     const token = localStorage.getItem("token");
-
+    const API_URL = "https://budget-expense-tracker-backend-o965.onrender.com";
     try {
       const res = await fetch(`${API_URL}/income`, {
         method: "POST",
