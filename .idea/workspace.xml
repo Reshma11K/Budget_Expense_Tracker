@@ -4,18 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="54592e58-93b8-4572-b018-559b60e49bb7" name="Changes" comment="updated budget and dashboard for those budget changes">
-      <change afterPath="$PROJECT_DIR$/backend/services/utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/auth.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/db.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/db.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/ui/filters.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/ui/layout.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/ui/styles.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/api/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/api/api.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Dashboard.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Dashboard.jsx" afterDir="false" />
+    <list default="true" id="54592e58-93b8-4572-b018-559b60e49bb7" name="Changes" comment="updated requirements">
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -384,7 +374,23 @@
       <option name="project" value="LOCAL" />
       <updated>1775659227736</updated>
     </task>
-    <option name="localTasksCounter" value="37" />
+    <task id="LOCAL-00037" summary="update- streamlit free">
+      <option name="closed" value="true" />
+      <created>1775731452883</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1775731452883</updated>
+    </task>
+    <task id="LOCAL-00038" summary="updated requirements">
+      <option name="closed" value="true" />
+      <created>1775732809163</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1775732809163</updated>
+    </task>
+    <option name="localTasksCounter" value="39" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -426,8 +432,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixed patch" />
-    <MESSAGE value="Added dotenv dependency" />
     <MESSAGE value="Hard coded credentials" />
     <MESSAGE value="Testing with initializing connection once" />
     <MESSAGE value="Switch to Secrets. Connect using Transacton pooler" />
@@ -451,7 +455,9 @@
     <MESSAGE value="React implementation for Income,Expense, dashboard tabs" />
     <MESSAGE value="frontend files" />
     <MESSAGE value="updated budget and dashboard for those budget changes" />
-    <option name="LAST_COMMIT_MESSAGE" value="updated budget and dashboard for those budget changes" />
+    <MESSAGE value="update- streamlit free" />
+    <MESSAGE value="updated requirements" />
+    <option name="LAST_COMMIT_MESSAGE" value="updated requirements" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
