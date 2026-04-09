@@ -4,8 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="54592e58-93b8-4572-b018-559b60e49bb7" name="Changes" comment="updated requirements">
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+    <list default="true" id="54592e58-93b8-4572-b018-559b60e49bb7" name="Changes" comment="UPDATED API url">
+      <change beforePath="$PROJECT_DIR$/backend/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -390,7 +390,31 @@
       <option name="project" value="LOCAL" />
       <updated>1775732809163</updated>
     </task>
-    <option name="localTasksCounter" value="39" />
+    <task id="LOCAL-00039" summary="updated requirements">
+      <option name="closed" value="true" />
+      <created>1775734809735</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1775734809735</updated>
+    </task>
+    <task id="LOCAL-00040" summary="UPDATED API url">
+      <option name="closed" value="true" />
+      <created>1775740519581</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1775740519581</updated>
+    </task>
+    <task id="LOCAL-00041" summary="UPDATED API url">
+      <option name="closed" value="true" />
+      <created>1775740628324</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1775740628324</updated>
+    </task>
+    <option name="localTasksCounter" value="42" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -432,7 +456,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Hard coded credentials" />
     <MESSAGE value="Testing with initializing connection once" />
     <MESSAGE value="Switch to Secrets. Connect using Transacton pooler" />
     <MESSAGE value="Fixed for adding transactions from before" />
@@ -457,7 +480,8 @@
     <MESSAGE value="updated budget and dashboard for those budget changes" />
     <MESSAGE value="update- streamlit free" />
     <MESSAGE value="updated requirements" />
-    <option name="LAST_COMMIT_MESSAGE" value="updated requirements" />
+    <MESSAGE value="UPDATED API url" />
+    <option name="LAST_COMMIT_MESSAGE" value="UPDATED API url" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
