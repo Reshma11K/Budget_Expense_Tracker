@@ -4,20 +4,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="54592e58-93b8-4572-b018-559b60e49bb7" name="Changes" comment="Ignore .idea folder">
-      <change afterPath="$PROJECT_DIR$/frontend/src/api/api.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/pages/Dashboard.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/pages/Expenses.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/pages/Income.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/styles.css" afterDir="false" />
+    <list default="true" id="54592e58-93b8-4572-b018-559b60e49bb7" name="Changes" comment="updated budget and dashboard for those budget changes">
+      <change afterPath="$PROJECT_DIR$/backend/services/utils.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/auth.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/db.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/db.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/auth_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/auth_service.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/budget_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/budget_service.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/expense_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/expense_service.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/income_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/income_service.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/db.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/db.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ui/filters.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ui/layout.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ui/styles.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/api/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/api/api.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Dashboard.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Dashboard.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -78,6 +76,7 @@
 }</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\PythonProjects\Budget_Expense_Tracker" />
       <recent name="D:\PythonProjects\Budget_Expense_Tracker\backend" />
       <recent name="D:\PythonProjects\Budget_Expense_Tracker\backend\services" />
     </key>
@@ -361,7 +360,31 @@
       <option name="project" value="LOCAL" />
       <updated>1774456094512</updated>
     </task>
-    <option name="localTasksCounter" value="34" />
+    <task id="LOCAL-00034" summary="React implementation for Income,Expense, dashboard tabs">
+      <option name="closed" value="true" />
+      <created>1775635553718</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1775635553718</updated>
+    </task>
+    <task id="LOCAL-00035" summary="frontend files">
+      <option name="closed" value="true" />
+      <created>1775635583260</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1775635583260</updated>
+    </task>
+    <task id="LOCAL-00036" summary="updated budget and dashboard for those budget changes">
+      <option name="closed" value="true" />
+      <created>1775659227736</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1775659227736</updated>
+    </task>
+    <option name="localTasksCounter" value="37" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -403,8 +426,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="updates" />
-    <MESSAGE value="Test" />
     <MESSAGE value="Fixed patch" />
     <MESSAGE value="Added dotenv dependency" />
     <MESSAGE value="Hard coded credentials" />
@@ -427,7 +448,10 @@
     <MESSAGE value="Insert via API" />
     <MESSAGE value="CRUD working" />
     <MESSAGE value="Sidebar navigation" />
-    <option name="LAST_COMMIT_MESSAGE" value="Sidebar navigation" />
+    <MESSAGE value="React implementation for Income,Expense, dashboard tabs" />
+    <MESSAGE value="frontend files" />
+    <MESSAGE value="updated budget and dashboard for those budget changes" />
+    <option name="LAST_COMMIT_MESSAGE" value="updated budget and dashboard for those budget changes" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

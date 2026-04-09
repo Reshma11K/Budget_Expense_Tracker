@@ -1,27 +1,40 @@
-const API_URL = "http://127.0.0.1:8000";
+const API_URL = import.meta.env.VITE_API_URL;
+//const API_URL = "http://127.0.0.1:8000";
 
+// ==============================
+// 💰 GET INCOME
+// ==============================
 export async function getIncome(month) {
   const token = localStorage.getItem("token");
 
+  if (!token) {
+    throw new Error("No token found");
+  }
+
+  console.log("TOKEN SENT:", token);
+
   const res = await fetch(
-    `http://127.0.0.1:8000/income?month=${month}`,
+    `${API_URL}/income?month=${month}`,
     {
       headers: {
-        Authorization: `Bearer ${token}`,
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
       },
     }
   );
 
   if (res.status === 401) {
-    // 💥 AUTO RESET BAD TOKEN
     localStorage.removeItem("token");
-    window.location.reload(); // forces login screen
+    window.location.reload();
     throw new Error("Unauthorized");
   }
 
   return await res.json();
 }
 
+// ==============================
+// 🔐 LOGIN
+// ==============================
 export async function login(username, password) {
   const res = await fetch(`${API_URL}/login`, {
     method: "POST",
@@ -34,14 +47,24 @@ export async function login(username, password) {
   return res.json();
 }
 
+// ==============================
+// 🧾 GET EXPENSES
+// ==============================
 export async function getExpenses(month) {
   const token = localStorage.getItem("token");
 
+  if (!token) {
+    throw new Error("No token found");
+  }
+
+  console.log("TOKEN SENT:", token);
+
   const res = await fetch(
-    `http://127.0.0.1:8000/expenses?month=${month}`,
+    `${API_URL}/expenses?month=${month}`,
     {
       headers: {
-        Authorization: `Bearer ${token}`,
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
       },
     }
   );
