@@ -1,6 +1,7 @@
 bcrypt==3.2.2
 fastapi==0.135.1
 passlib==1.7.4
+pandas
 psycopg2-binary==2.9.11
 python-dotenv
 python-jose==3.5.0
