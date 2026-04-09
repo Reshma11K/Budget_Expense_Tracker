@@ -1,6 +1,12 @@
 from fastapi import FastAPI, Query, Depends
 from fastapi.middleware.cors import CORSMiddleware
 
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+print("LOADED DB HOST:", os.getenv("DB_HOST"))
 
 from backend.services.income_service import (
     get_all_income,

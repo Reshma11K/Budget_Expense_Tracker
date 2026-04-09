@@ -4,10 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="54592e58-93b8-4572-b018-559b60e49bb7" name="Changes" comment="frontend files">
-      <change afterPath="$PROJECT_DIR$/frontend/src/pages/Budget.jsx" afterDir="false" />
+    <list default="true" id="54592e58-93b8-4572-b018-559b60e49bb7" name="Changes" comment="updated budget and dashboard for those budget changes">
+      <change afterPath="$PROJECT_DIR$/backend/services/utils.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/App.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/auth.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/db.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/db.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ui/filters.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ui/layout.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/ui/styles.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/api/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/api/api.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/pages/Dashboard.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Dashboard.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -69,6 +76,7 @@
 }</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\PythonProjects\Budget_Expense_Tracker" />
       <recent name="D:\PythonProjects\Budget_Expense_Tracker\backend" />
       <recent name="D:\PythonProjects\Budget_Expense_Tracker\backend\services" />
     </key>
@@ -368,7 +376,15 @@
       <option name="project" value="LOCAL" />
       <updated>1775635583260</updated>
     </task>
-    <option name="localTasksCounter" value="36" />
+    <task id="LOCAL-00036" summary="updated budget and dashboard for those budget changes">
+      <option name="closed" value="true" />
+      <created>1775659227736</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1775659227736</updated>
+    </task>
+    <option name="localTasksCounter" value="37" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -410,7 +426,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Test" />
     <MESSAGE value="Fixed patch" />
     <MESSAGE value="Added dotenv dependency" />
     <MESSAGE value="Hard coded credentials" />
@@ -435,7 +450,8 @@
     <MESSAGE value="Sidebar navigation" />
     <MESSAGE value="React implementation for Income,Expense, dashboard tabs" />
     <MESSAGE value="frontend files" />
-    <option name="LAST_COMMIT_MESSAGE" value="frontend files" />
+    <MESSAGE value="updated budget and dashboard for those budget changes" />
+    <option name="LAST_COMMIT_MESSAGE" value="updated budget and dashboard for those budget changes" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -1,16 +1,23 @@
 import psycopg2
 import pandas as pd
-import streamlit as st
+
+
+import os
 
 def get_conn():
     return psycopg2.connect(
-        host=st.secrets["DB_HOST"],
-        database=st.secrets["DB_NAME"],
-        user=st.secrets["DB_USER"],
-        password=st.secrets["DB_PASSWORD"],
-        port=int(st.secrets.get("DB_PORT", 5432)),
+        host=os.getenv("DB_HOST"),
+        database=os.getenv("DB_NAME"),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+        port=int(os.getenv("DB_PORT", 6543)),
         sslmode="require"
     )
+
+
+print("DB_HOST:", os.getenv("DB_HOST"))
+print("DB_NAME:", os.getenv("DB_NAME"))
+print("DB_USER:", os.getenv("DB_USER"))
 
 def load_df(query, params=None):
     conn = get_conn()
@@ -27,3 +34,4 @@ def execute(query, params=None):
         conn.commit()
     finally:
         conn.close()
+

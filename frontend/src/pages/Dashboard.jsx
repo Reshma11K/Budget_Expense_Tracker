@@ -61,20 +61,26 @@ export default function Dashboard() {
   // ==============================
   // FETCH CURRENT MONTH
   // ==============================
-  useEffect(() => {
-    Promise.all([getIncome(month), getExpenses(month)])
-      .then(([inc, exp]) => {
-        setIncome(inc || []);
-        setExpenses(exp || []);
-      });
-  }, [month]);
+    useEffect(() => {
+      const token = localStorage.getItem("token");
+      if (!token) return; // ⛔ WAIT until token exists
+
+      Promise.all([getIncome(month), getExpenses(month)])
+        .then(([inc, exp]) => {
+          setIncome(inc || []);
+          setExpenses(exp || []);
+        });
+    }, [month]);
 
   // ==============================
   // FETCH TREND DATA
   // ==============================
   useEffect(() => {
     const load = async () => {
-      let data = [];
+       const token = localStorage.getItem("token");
+       if (!token) return;
+
+       let data = [];
 
       for (let m of months) {
         const inc = await getIncome(m);
