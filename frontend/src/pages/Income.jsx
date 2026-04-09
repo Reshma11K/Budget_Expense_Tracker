@@ -86,7 +86,7 @@ export default function Income() {
     const token = localStorage.getItem("token");
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/income", {
+      const res = await fetch(`${API_URL}/income`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -153,7 +153,7 @@ export default function Income() {
     const token = localStorage.getItem("token");
 
     for (const item of editedData) {
-      await fetch(`http://127.0.0.1:8000/income/${item.id}`, {
+      await fetch(`${API_URL}/income/${item.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -179,7 +179,7 @@ export default function Income() {
     const token = localStorage.getItem("token");
 
     for (const item of editedData.filter(i => i.Delete)) {
-      await fetch(`http://127.0.0.1:8000/income/${item.id}`, {
+      await fetch(`${API_URL}/income/${item.id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`

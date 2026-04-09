@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="54592e58-93b8-4572-b018-559b60e49bb7" name="Changes" comment="updated requirements">
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+    <list default="true" id="54592e58-93b8-4572-b018-559b60e49bb7" name="Changes" comment="code update in main py for testing">
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Expenses.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Expenses.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Income.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Income.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,12 +38,22 @@
   <component name="GithubDefaultAccount">
     <option name="defaultAccountId" value="0fdfae05-8760-4673-acf1-d15d5efe2091" />
   </component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/Reshma11K/Budget_Expense_Tracker.git&quot;,
-    &quot;accountId&quot;: &quot;0fdfae05-8760-4673-acf1-d15d5efe2091&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/Reshma11K/Budget_Expense_Tracker.git",
+    "accountId": "0fdfae05-8760-4673-acf1-d15d5efe2091"
+  },
+  "recentNewPullRequestHead": {
+    "server": {
+      "useHttp": false,
+      "host": "github.com",
+      "port": null,
+      "suffix": null
+    },
+    "owner": "Reshma11K",
+    "repository": "Budget_Expense_Tracker"
   }
-}</component>
+}]]></component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/app.py" root0="FORCE_HIGHLIGHTING" />
   </component>
@@ -54,16 +65,16 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;dev&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "#6 on dev",
+    "settings.editor.selected.configurable": "preferences.lookFeel"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="D:\PythonProjects\Budget_Expense_Tracker" />
@@ -390,7 +401,39 @@
       <option name="project" value="LOCAL" />
       <updated>1775732809163</updated>
     </task>
-    <option name="localTasksCounter" value="39" />
+    <task id="LOCAL-00039" summary="updated requirements">
+      <option name="closed" value="true" />
+      <created>1775734809735</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1775734809735</updated>
+    </task>
+    <task id="LOCAL-00040" summary="UPDATED API url">
+      <option name="closed" value="true" />
+      <created>1775740519581</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1775740519581</updated>
+    </task>
+    <task id="LOCAL-00041" summary="UPDATED API url">
+      <option name="closed" value="true" />
+      <created>1775740628324</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1775740628324</updated>
+    </task>
+    <task id="LOCAL-00042" summary="code update in main py for testing">
+      <option name="closed" value="true" />
+      <created>1775742823412</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1775742823412</updated>
+    </task>
+    <option name="localTasksCounter" value="43" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -432,8 +475,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Hard coded credentials" />
-    <MESSAGE value="Testing with initializing connection once" />
     <MESSAGE value="Switch to Secrets. Connect using Transacton pooler" />
     <MESSAGE value="Fixed for adding transactions from before" />
     <MESSAGE value="Fixed for adding transactions form with the new database fix" />
@@ -457,7 +498,9 @@
     <MESSAGE value="updated budget and dashboard for those budget changes" />
     <MESSAGE value="update- streamlit free" />
     <MESSAGE value="updated requirements" />
-    <option name="LAST_COMMIT_MESSAGE" value="updated requirements" />
+    <MESSAGE value="UPDATED API url" />
+    <MESSAGE value="code update in main py for testing" />
+    <option name="LAST_COMMIT_MESSAGE" value="code update in main py for testing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
