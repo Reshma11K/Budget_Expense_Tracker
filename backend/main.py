@@ -95,7 +95,10 @@ from pydantic import BaseModel
 class RegisterRequest(BaseModel):
     username: str
     password: str
-
+    
+@app.options("/{full_path:path}")
+async def preflight_handler():
+    return {"status": "ok"}
 
 @app.post("/register")
 def register(data: RegisterRequest):
