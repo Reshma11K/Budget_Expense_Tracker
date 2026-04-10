@@ -190,3 +190,9 @@ def remove_expense(expense_id: int, user: str = Depends(verify_token)):
 @app.get("/dashboard-summary")
 def dashboard_summary(month: str , user: str = Depends(verify_token)):
     return get_dashboard_summary(month)
+
+from backend.services.budget_service import get_budgets
+
+@app.get("/budgets")
+def fetch_budgets(month: str, user: str = Depends(verify_token)):
+    return get_budgets_for_month(month)

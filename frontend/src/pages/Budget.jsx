@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getExpenses } from "../api/api";
+import { getExpenses, getBudgets } from "../api/api";
 
 // ==============================
 // 📅 Month Generator
@@ -27,10 +28,7 @@ export default function Budget() {
 
   const [month, setMonth] = useState(months[months.length - 2]);
   const [expenses, setExpenses] = useState([]);
-
-  const [budgets, setBudgets] = useState(
-    JSON.parse(localStorage.getItem("budgets")) || {}
-  );
+  const [budgets, setBudgets] = useState({});
 
   // ==============================
   // FETCH EXPENSES
@@ -41,6 +39,18 @@ export default function Budget() {
       .catch(() => setExpenses([]));
   }, [month]);
 
+ // FETCH BUDGETS
+    useEffect(() => {
+      getBudgets(month)
+        .then((res) => {
+          const mapped = {};
+          res.forEach((b) => {
+            mapped[b.category] = b.budget;
+          });
+          setBudgets(mapped);
+        })
+        .catch(() => setBudgets({}));
+    }, [month]);
   // ==============================
   // SAVE BUDGETS
   // ==============================

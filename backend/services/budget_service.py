@@ -2,7 +2,7 @@ from backend.db import load_df, execute
 import pandas as pd
 
 
-def get_budgets_for_month(month: str):
+def get_budgets(month: str):
     return load_df(
         """
         SELECT month, category, budget, is_recurring

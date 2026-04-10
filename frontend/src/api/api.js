@@ -78,3 +78,18 @@ export async function getExpenses(month) {
 
   return await res.json();
 }
+
+// ==============================
+// 🧾 GET Budget
+// ==============================
+export async function getBudgets(month) {
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(`${API_URL}/budgets?month=${month}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return await res.json();
+}
