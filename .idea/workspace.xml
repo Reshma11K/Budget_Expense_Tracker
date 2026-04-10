@@ -4,9 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="54592e58-93b8-4572-b018-559b60e49bb7" name="Changes" comment="code update in main py for testing">
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Expenses.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Expenses.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Income.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Income.jsx" afterDir="false" />
+    <list default="true" id="54592e58-93b8-4572-b018-559b60e49bb7" name="Changes" comment="updated url">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/App.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/api/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/api/api.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,22 +39,22 @@
   <component name="GithubDefaultAccount">
     <option name="defaultAccountId" value="0fdfae05-8760-4673-acf1-d15d5efe2091" />
   </component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/Reshma11K/Budget_Expense_Tracker.git",
-    "accountId": "0fdfae05-8760-4673-acf1-d15d5efe2091"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Reshma11K/Budget_Expense_Tracker.git&quot;,
+    &quot;accountId&quot;: &quot;0fdfae05-8760-4673-acf1-d15d5efe2091&quot;
   },
-  "recentNewPullRequestHead": {
-    "server": {
-      "useHttp": false,
-      "host": "github.com",
-      "port": null,
-      "suffix": null
+  &quot;recentNewPullRequestHead&quot;: {
+    &quot;server&quot;: {
+      &quot;useHttp&quot;: false,
+      &quot;host&quot;: &quot;github.com&quot;,
+      &quot;port&quot;: null,
+      &quot;suffix&quot;: null
     },
-    "owner": "Reshma11K",
-    "repository": "Budget_Expense_Tracker"
+    &quot;owner&quot;: &quot;Reshma11K&quot;,
+    &quot;repository&quot;: &quot;Budget_Expense_Tracker&quot;
   }
-}]]></component>
+}</component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/app.py" root0="FORCE_HIGHLIGHTING" />
   </component>
@@ -71,7 +72,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "#6 on dev",
+    "git-widget-placeholder": "dev",
     "settings.editor.selected.configurable": "preferences.lookFeel"
   }
 }]]></component>
@@ -433,7 +434,15 @@
       <option name="project" value="LOCAL" />
       <updated>1775742823412</updated>
     </task>
-    <option name="localTasksCounter" value="43" />
+    <task id="LOCAL-00043" summary="updated url">
+      <option name="closed" value="true" />
+      <created>1775743474666</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1775743474666</updated>
+    </task>
+    <option name="localTasksCounter" value="44" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -462,7 +471,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="origin/dev_KPI" />
+                        <option value="master" />
                       </list>
                     </value>
                   </entry>
@@ -475,7 +484,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Switch to Secrets. Connect using Transacton pooler" />
     <MESSAGE value="Fixed for adding transactions from before" />
     <MESSAGE value="Fixed for adding transactions form with the new database fix" />
     <MESSAGE value="updated recurring rule logic" />
@@ -500,7 +508,8 @@
     <MESSAGE value="updated requirements" />
     <MESSAGE value="UPDATED API url" />
     <MESSAGE value="code update in main py for testing" />
-    <option name="LAST_COMMIT_MESSAGE" value="code update in main py for testing" />
+    <MESSAGE value="updated url" />
+    <option name="LAST_COMMIT_MESSAGE" value="updated url" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

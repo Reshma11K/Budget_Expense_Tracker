@@ -9,7 +9,7 @@ export default function App() {
   // ==============================
   // 🔐 AUTH STATE
   // ==============================
-  const API_URL = "https://budget-expense-tracker-backend-0965.onrender.com";
+  const API_URL = "https://budget-expense-tracker-backend-o965.onrender.com";
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [page, setPage] = useState("dashboard");
 

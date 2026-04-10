@@ -1,4 +1,4 @@
-const API_URL = "https://budget-expense-tracker-backend-0965.onrender.com";
+const API_URL = "https://budget-expense-tracker-backend-o965.onrender.com";
 //const API_URL = import.meta.env.VITE_API_URL;
 //const API_URL = "http://127.0.0.1:8000";
 
