@@ -103,7 +103,7 @@ export default function Expenses() {
   // ==============================
   const handleAddExpense = async () => {
     const token = localStorage.getItem("token");
-
+  const API_URL = "https://budget-expense-tracker-backend-o965.onrender.com";
     if (!newItem.date || !newItem.name || !newItem.amount) {
       alert("Fill required fields");
       return;
