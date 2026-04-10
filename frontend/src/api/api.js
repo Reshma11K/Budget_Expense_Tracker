@@ -86,6 +86,7 @@ export async function getBudgets(month) {
   const token = localStorage.getItem("token");
 
   const res = await fetch(`${API_URL}/budgets?month=${month}`, {
+    method: "GET",   // ✅ IMPORTANT
     headers: {
       Authorization: `Bearer ${token}`,
     },
