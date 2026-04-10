@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getExpenses } from "../api/api";
-import { getExpenses, getBudgets } from "../api/api";
+import { getBudgets } from "../api/api";
 
 // ==============================
 // 📅 Month Generator
