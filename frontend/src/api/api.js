@@ -94,3 +94,21 @@ export async function getBudgets(month) {
 
   return await res.json();
 }
+
+export async function saveBudget(month, category, amount) {
+  const token = localStorage.getItem("token");
+
+  await fetch(`${API_URL}/budgets`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      month,
+      category,
+      amount,
+      is_recurring: true
+    }),
+  });
+}

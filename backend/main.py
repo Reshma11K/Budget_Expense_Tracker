@@ -191,11 +191,37 @@ def remove_expense(expense_id: int, user: str = Depends(verify_token)):
 def dashboard_summary(month: str , user: str = Depends(verify_token)):
     return get_dashboard_summary(month)
 
-from backend.services.budget_service import get_budgets_for_month
+
+
+from backend.services.budget_service import (
+    get_budgets_for_month,
+    auto_apply_recurring_budgets
+)
 
 @app.get("/budgets")
 def fetch_budgets(month: str, user: str = Depends(verify_token)):
+
+    # 🔥 MAGIC LINE
+    auto_apply_recurring_budgets(month)
+
     df = get_budgets_for_month(month)
     return df.to_dict(orient="records")
-    if df.empty:
-        return []
+
+from backend.services.budget_service import add_or_update_budget
+
+class BudgetUpdate(BaseModel):
+    month: str
+    category: str
+    amount: float
+    is_recurring: bool = True
+
+
+@app.post("/budgets")
+def save_budget(data: BudgetUpdate, user: str = Depends(verify_token)):
+    add_or_update_budget(
+        data.month,
+        data.category,
+        data.amount,
+        data.is_recurring
+    )
+    return {"status": "saved"}

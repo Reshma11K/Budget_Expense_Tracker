@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getExpenses, getBudgets } from "../api/api";
+import { getExpenses, getBudgets, saveBudget } from "../api/api";
 
 // ==============================
 // 📅 Month Generator
@@ -30,7 +30,7 @@ export default function Budget() {
   const [budgets, setBudgets] = useState({});
 
   // ==============================
-  // FETCH EXPENSES
+  // 📥 FETCH EXPENSES
   // ==============================
   useEffect(() => {
     getExpenses(month)
@@ -38,27 +38,23 @@ export default function Budget() {
       .catch(() => setExpenses([]));
   }, [month]);
 
- // FETCH BUDGETS
-    useEffect(() => {
-      getBudgets(month)
-        .then((res) => {
-          const mapped = {};
-          res.forEach((b) => {
-            mapped[b.category] = b.budget;
-          });
-          setBudgets(mapped);
-        })
-        .catch(() => setBudgets({}));
-    }, [month]);
   // ==============================
-  // SAVE BUDGETS
+  // 💰 FETCH BUDGETS
   // ==============================
   useEffect(() => {
-    localStorage.setItem("budgets", JSON.stringify(budgets));
-  }, [budgets]);
+    getBudgets(month)
+      .then((res) => {
+        const mapped = {};
+        res.forEach((b) => {
+          mapped[b.category] = b.budget;
+        });
+        setBudgets(mapped);
+      })
+      .catch(() => setBudgets({}));
+  }, [month]);
 
   // ==============================
-  // CATEGORY TOTALS
+  // 📊 CATEGORY TOTALS
   // ==============================
   const categoryTotals = expenses.reduce((acc, e) => {
     acc[e.category] = (acc[e.category] || 0) + e.amount;
@@ -69,12 +65,13 @@ export default function Budget() {
 
   return (
     <div className="card">
-
       <h2>🎯 Budget</h2>
 
-      {/* MONTH */}
+      {/* MONTH SELECT */}
       <select value={month} onChange={(e) => setMonth(e.target.value)}>
-        {months.map((m) => <option key={m}>{m}</option>)}
+        {months.map((m) => (
+          <option key={m}>{m}</option>
+        ))}
       </select>
 
       <table style={{ marginTop: "20px" }} border="1" cellPadding="10">
@@ -102,34 +99,41 @@ export default function Budget() {
                   <input
                     type="number"
                     value={budget}
-                    onChange={(e) =>
+                    onChange={async (e) => {
+                      const value = Number(e.target.value);
+
+                      // ⚡ Instant UI update
                       setBudgets({
                         ...budgets,
-                        [cat]: Number(e.target.value)
-                      })
-                    }
+                        [cat]: value,
+                      });
+
+                      try {
+                        // 💾 Save to backend
+                        await saveBudget(month, cat, value);
+                      } catch (err) {
+                        console.error("Failed to save budget", err);
+                      }
+                    }}
                     style={{ width: "80px" }}
                   />
                 </td>
 
                 <td>€{spent.toFixed(2)}</td>
 
-                <td style={{
-                  color: isOver ? "red" : "green",
-                  fontWeight: "bold"
-                }}>
-                  {budget === 0
-                    ? "—"
-                    : isOver
-                      ? "Over"
-                      : "OK"}
+                <td
+                  style={{
+                    color: budget === 0 ? "gray" : isOver ? "red" : "green",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {budget === 0 ? "—" : isOver ? "Over" : "OK"}
                 </td>
               </tr>
             );
           })}
         </tbody>
       </table>
-
     </div>
   );
 }
