@@ -195,5 +195,16 @@ from backend.services.budget_service import get_budgets_for_month
 
 @app.get("/budgets")
 def fetch_budgets(month: str, user: str = Depends(verify_token)):
-    df = get_budgets_for_month(month)
-    return df.to_dict(orient="records")   # ✅ FIX
+    try:
+        df = get_budgets_for_month(month)
+
+        print("BUDGET DF:", df)
+
+        if df is None:
+            return []
+
+        return df.to_dict(orient="records")
+
+    except Exception as e:
+        print("🔥 BUDGET ERROR:", e)
+        return {"error": str(e)}
