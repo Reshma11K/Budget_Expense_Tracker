@@ -218,10 +218,13 @@ class BudgetUpdate(BaseModel):
 
 @app.post("/budgets")
 def save_budget(data: BudgetUpdate, user: str = Depends(verify_token)):
+    print("🔥 SAVING:", data)
+
     add_or_update_budget(
         data.month,
         data.category,
         data.amount,
         data.is_recurring
     )
+
     return {"status": "saved"}
