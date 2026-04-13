@@ -4,8 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="54592e58-93b8-4572-b018-559b60e49bb7" name="Changes" comment="code update for Budget">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="54592e58-93b8-4572-b018-559b60e49bb7" name="Changes" comment="code update for Budget in main.py to test the budget page">
+      <change beforePath="$PROJECT_DIR$/backend/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -456,7 +456,15 @@
       <option name="project" value="LOCAL" />
       <updated>1775829767263</updated>
     </task>
-    <option name="localTasksCounter" value="46" />
+    <task id="LOCAL-00046" summary="code update for Budget in main.py to test the budget page">
+      <option name="closed" value="true" />
+      <created>1776076762293</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1776076762293</updated>
+    </task>
+    <option name="localTasksCounter" value="47" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -498,7 +506,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fixed for adding transactions form with the new database fix" />
     <MESSAGE value="updated recurring rule logic" />
     <MESSAGE value="updates- added a delete and edit feature for the data entry." />
     <MESSAGE value="Recurring income and expenses auto-apply. Month picker in dashboard." />
@@ -523,7 +530,8 @@
     <MESSAGE value="code update in main py for testing" />
     <MESSAGE value="code update for Budget" />
     <MESSAGE value="code update for Budget in main.py" />
-    <option name="LAST_COMMIT_MESSAGE" value="code update for Budget in main.py" />
+    <MESSAGE value="code update for Budget in main.py to test the budget page" />
+    <option name="LAST_COMMIT_MESSAGE" value="code update for Budget in main.py to test the budget page" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
