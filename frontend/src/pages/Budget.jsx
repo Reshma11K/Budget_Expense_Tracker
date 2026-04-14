@@ -1,16 +1,7 @@
 import { useEffect, useState } from "react";
 import { getExpenses, getBudgets, saveBudget } from "../api/api";
+import { bumpCacheVersion } from "../utils/cache";
 
-// ==============================
-// clear cache
-// ==============================
-function clearCache() {
-  Object.keys(localStorage).forEach((key) => {
-    if (key.startsWith("dashboard-") || key === "trendData") {
-      localStorage.removeItem(key);
-    }
-  });
-}
 
 // ==============================
 // 📅 Month Generator
@@ -122,7 +113,7 @@ export default function Budget() {
                       try {
                         // 💾 Save to backend
                         await saveBudget(month, cat, value);
-                        clearCache(); // ✅ ADD THIS HERE
+                        bumpCacheVersion();
                       } catch (err) {
                         console.error("Failed to save budget", err);
                       }

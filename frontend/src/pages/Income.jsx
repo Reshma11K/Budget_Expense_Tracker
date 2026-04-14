@@ -1,18 +1,9 @@
 import { useEffect, useState } from "react";
 import { getIncome } from "../api/api";
+import { bumpCacheVersion } from "../utils/cache";
 
 const API_URL = "https://budget-expense-tracker-backend-o965.onrender.com";
 
-// ==============================
-// clear cache
-// ==============================
-function clearCache() {
-  Object.keys(localStorage).forEach((key) => {
-    if (key.startsWith("dashboard-") || key === "trendData") {
-      localStorage.removeItem(key);
-    }
-  });
-}
 
 // ==============================
 // 📅 Month Generator
@@ -112,7 +103,7 @@ export default function Income() {
         })
       });
 
-  clearCache(); // ✅ ADD THIS LINE
+  bumpCacheVersion();
 
 
       if (!res.ok) throw new Error("Failed");

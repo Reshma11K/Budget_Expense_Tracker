@@ -1,19 +1,9 @@
 import { useEffect, useState } from "react";
 import { getExpenses } from "../api/api";
-
+import { bumpCacheVersion } from "../utils/cache";
 
 const API_URL = "https://budget-expense-tracker-backend-o965.onrender.com";
 
-// ==============================
-// clear cache
-// ==============================
-function clearCache() {
-  Object.keys(localStorage).forEach((key) => {
-    if (key.startsWith("dashboard-") || key === "trendData") {
-      localStorage.removeItem(key);
-    }
-  });
-}
 
 // ==============================
 // 📅 Month Generator
@@ -136,7 +126,7 @@ export default function Expenses() {
           expense_type: tab
         })
       });
-    clearCache(); // ✅ ADD THIS LINE
+    bumpCacheVersion(); //
 
       if (!res.ok) throw new Error("Failed");
 
@@ -220,7 +210,7 @@ export default function Expenses() {
     setData(refreshed);
     setEditedData(refreshed);
 
-    clearCache();
+    bumpCacheVersion();
   };
 
   // ==============================
@@ -236,7 +226,7 @@ export default function Expenses() {
           Authorization: `Bearer ${token}`
         }
       });
-    clearCache();
+    bumpCacheVersion();
     }
 
     const refreshed = await getExpenses(month);

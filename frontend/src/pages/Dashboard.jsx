@@ -5,6 +5,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
   LineChart, Line, Legend
 } from "recharts";
+import { getCacheVersion } from "../utils/cache";
 
 // ==============================
 // 📅 MONTH GENERATOR
@@ -60,40 +61,45 @@ export default function Dashboard() {
   // ==============================
   // FETCH CURRENT MONTH (CACHED)
   // ==============================
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
+ useEffect(() => {
+  const token = localStorage.getItem("token");
+  if (!token) return;
 
-    const cacheKey = `dashboard-${month}`;
-    const cached = localStorage.getItem(cacheKey);
+  const version = localStorage.getItem("dataVersion") || "0";
+  const cacheKey = `dashboard-${month}-v${version}`;
 
-    if (cached) {
-      const parsed = JSON.parse(cached);
-      setIncome(parsed.income || []);
-      setExpenses(parsed.expenses || []);
-      return;
-    }
+  const cached = localStorage.getItem(cacheKey);
 
-    Promise.all([getIncome(month), getExpenses(month)])
-      .then(([inc, exp]) => {
-        setIncome(inc || []);
-        setExpenses(exp || []);
+  if (cached) {
+    const parsed = JSON.parse(cached);
+    setIncome(parsed.income || []);
+    setExpenses(parsed.expenses || []);
+    return;
+  }
 
-        localStorage.setItem(
-          cacheKey,
-          JSON.stringify({
-            income: inc || [],
-            expenses: exp || []
-          })
-        );
-      });
-  }, [month]);
+  Promise.all([getIncome(month), getExpenses(month)])
+    .then(([inc, exp]) => {
+      setIncome(inc || []);
+      setExpenses(exp || []);
+
+      localStorage.setItem(
+        cacheKey,
+        JSON.stringify({
+          income: inc || [],
+          expenses: exp || []
+        })
+      );
+    });
+}, [month]);
 
   // ==============================
   // FETCH TREND DATA (CACHED FIXED)
   // ==============================
   useEffect(() => {
-    const token = localStorage.getItem("token");
+   const version = localStorage.getItem("dataVersion") || "0";
+   const cacheKey = `trendData-v${version}`;
+   const cached = localStorage.getItem(cacheKey);
+
     if (!token) return;
 
     const cached = localStorage.getItem("trendData");
