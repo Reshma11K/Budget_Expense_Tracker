@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { getExpenses } from "../api/api";
 
+
+const API_URL = "https://budget-expense-tracker-backend-o965.onrender.com";
+
 // ==============================
 // clear cache
 // ==============================
@@ -114,7 +117,7 @@ export default function Expenses() {
   // ==============================
   const handleAddExpense = async () => {
     const token = localStorage.getItem("token");
-  const API_URL = "https://budget-expense-tracker-backend-o965.onrender.com";
+
     if (!newItem.date || !newItem.name || !newItem.amount) {
       alert("Fill required fields");
       return;
@@ -216,6 +219,8 @@ export default function Expenses() {
     const refreshed = await getExpenses(month);
     setData(refreshed);
     setEditedData(refreshed);
+
+    clearCache();
   };
 
   // ==============================
@@ -231,6 +236,7 @@ export default function Expenses() {
           Authorization: `Bearer ${token}`
         }
       });
+    clearCache();
     }
 
     const refreshed = await getExpenses(month);

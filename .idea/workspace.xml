@@ -4,8 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="54592e58-93b8-4572-b018-559b60e49bb7" name="Changes" comment="code updated for cache storage and clearance">
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Dashboard.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Dashboard.jsx" afterDir="false" />
+    <list default="true" id="54592e58-93b8-4572-b018-559b60e49bb7" name="Changes" comment="code updated for dashboard">
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Expenses.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Expenses.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -95,38 +95,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1768409758745</updated>
-    </task>
-    <task id="LOCAL-00002" summary="updates">
-      <option name="closed" value="true" />
-      <created>1771259886542</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1771259886542</updated>
-    </task>
-    <task id="LOCAL-00003" summary="updates">
-      <option name="closed" value="true" />
-      <created>1771261092166</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1771261092166</updated>
-    </task>
-    <task id="LOCAL-00004" summary="updates">
-      <option name="closed" value="true" />
-      <created>1771261187807</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1771261187807</updated>
-    </task>
-    <task id="LOCAL-00005" summary="updates">
-      <option name="closed" value="true" />
-      <created>1771419779737</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1771419779737</updated>
     </task>
     <task id="LOCAL-00006" summary="Test">
       <option name="closed" value="true" />
@@ -488,7 +456,39 @@
       <option name="project" value="LOCAL" />
       <updated>1776157524971</updated>
     </task>
-    <option name="localTasksCounter" value="51" />
+    <task id="LOCAL-00051" summary="code updated for dashboard">
+      <option name="closed" value="true" />
+      <created>1776159669235</created>
+      <option name="number" value="00051" />
+      <option name="presentableId" value="LOCAL-00051" />
+      <option name="project" value="LOCAL" />
+      <updated>1776159669235</updated>
+    </task>
+    <task id="LOCAL-00052" summary="code updated for dashboard">
+      <option name="closed" value="true" />
+      <created>1776161028960</created>
+      <option name="number" value="00052" />
+      <option name="presentableId" value="LOCAL-00052" />
+      <option name="project" value="LOCAL" />
+      <updated>1776161028960</updated>
+    </task>
+    <task id="LOCAL-00053" summary="code updated for dashboard">
+      <option name="closed" value="true" />
+      <created>1776162301125</created>
+      <option name="number" value="00053" />
+      <option name="presentableId" value="LOCAL-00053" />
+      <option name="project" value="LOCAL" />
+      <updated>1776162301125</updated>
+    </task>
+    <task id="LOCAL-00054" summary="code updated for dashboard">
+      <option name="closed" value="true" />
+      <created>1776170819469</created>
+      <option name="number" value="00054" />
+      <option name="presentableId" value="LOCAL-00054" />
+      <option name="project" value="LOCAL" />
+      <updated>1776170819469</updated>
+    </task>
+    <option name="localTasksCounter" value="55" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -530,7 +530,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Recurring income and expenses auto-apply. Month picker in dashboard." />
     <MESSAGE value="Merge remote-tracking branch 'origin/master'&#10;&#10;# Conflicts:&#10;#&#9;.idea/workspace.xml&#10;#&#9;app.py" />
     <MESSAGE value="updates to show budget table" />
     <MESSAGE value="updated month picker in dashboard" />
@@ -555,7 +554,8 @@
     <MESSAGE value="code update for Budget in main.py to test the budget page" />
     <MESSAGE value="code update for Budget to save, update the budgets" />
     <MESSAGE value="code updated for cache storage and clearance" />
-    <option name="LAST_COMMIT_MESSAGE" value="code updated for cache storage and clearance" />
+    <MESSAGE value="code updated for dashboard" />
+    <option name="LAST_COMMIT_MESSAGE" value="code updated for dashboard" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
