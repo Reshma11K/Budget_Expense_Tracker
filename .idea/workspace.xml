@@ -4,8 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="54592e58-93b8-4572-b018-559b60e49bb7" name="Changes" comment="code update for Budget in main.py to test the budget page">
+    <list default="true" id="54592e58-93b8-4572-b018-559b60e49bb7" name="Changes" comment="code update for Budget to save, update the budgets">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/api/api.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/api/api.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Budget.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Budget.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Dashboard.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Dashboard.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Expenses.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Expenses.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Income.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Income.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -480,7 +485,15 @@
       <option name="project" value="LOCAL" />
       <updated>1776084789887</updated>
     </task>
-    <option name="localTasksCounter" value="49" />
+    <task id="LOCAL-00049" summary="code update for Budget to save, update the budgets">
+      <option name="closed" value="true" />
+      <created>1776086297868</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1776086297868</updated>
+    </task>
+    <option name="localTasksCounter" value="50" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -522,7 +535,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="updated recurring rule logic" />
     <MESSAGE value="updates- added a delete and edit feature for the data entry." />
     <MESSAGE value="Recurring income and expenses auto-apply. Month picker in dashboard." />
     <MESSAGE value="Merge remote-tracking branch 'origin/master'&#10;&#10;# Conflicts:&#10;#&#9;.idea/workspace.xml&#10;#&#9;app.py" />
@@ -547,7 +559,8 @@
     <MESSAGE value="code update for Budget" />
     <MESSAGE value="code update for Budget in main.py" />
     <MESSAGE value="code update for Budget in main.py to test the budget page" />
-    <option name="LAST_COMMIT_MESSAGE" value="code update for Budget in main.py to test the budget page" />
+    <MESSAGE value="code update for Budget to save, update the budgets" />
+    <option name="LAST_COMMIT_MESSAGE" value="code update for Budget to save, update the budgets" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

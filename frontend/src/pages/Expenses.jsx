@@ -2,6 +2,17 @@ import { useEffect, useState } from "react";
 import { getExpenses } from "../api/api";
 
 // ==============================
+// clear cache
+// ==============================
+function clearCache() {
+  Object.keys(localStorage).forEach((key) => {
+    if (key.startsWith("dashboard-") || key === "trendData") {
+      localStorage.removeItem(key);
+    }
+  });
+}
+
+// ==============================
 // 📅 Month Generator
 // ==============================
 function generateMonths() {
@@ -122,6 +133,7 @@ export default function Expenses() {
           expense_type: tab
         })
       });
+    clearCache(); // ✅ ADD THIS LINE
 
       if (!res.ok) throw new Error("Failed");
 
