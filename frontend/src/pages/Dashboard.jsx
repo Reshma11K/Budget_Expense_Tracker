@@ -35,9 +35,6 @@ const Info = ({ text }) => (
   </span>
 );
 
-const [budgets, setBudgets] = useState(
-  JSON.parse(localStorage.getItem("budgets")) || {}
-);
 
 export default function Dashboard() {
   const months = generateMonths();
@@ -46,6 +43,10 @@ export default function Dashboard() {
   const [income, setIncome] = useState([]);
   const [expenses, setExpenses] = useState([]);
   const [trendData, setTrendData] = useState([]);
+
+  const [budgets, setBudgets] = useState(
+  JSON.parse(localStorage.getItem("budgets")) || {}
+  );
 
   const [corpus, setCorpus] = useState(
     Number(localStorage.getItem("corpus")) || 0
