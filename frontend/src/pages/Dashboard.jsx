@@ -35,6 +35,10 @@ const Info = ({ text }) => (
   </span>
 );
 
+const [budgets, setBudgets] = useState(
+  JSON.parse(localStorage.getItem("budgets")) || {}
+);
+
 export default function Dashboard() {
   const months = generateMonths();
   const [month, setMonth] = useState(months[months.length - 2]);
@@ -206,6 +210,25 @@ export default function Dashboard() {
     { name: "Variable", value: variableTotal }
   ];
 
+const budgetData = Object.entries(
+  expenses.reduce((acc, e) => {
+    acc[e.category] = (acc[e.category] || 0) + e.amount;
+    return acc;
+  }, {})
+)
+.map(([category, spent]) => {
+  const budget = budgets[category];
+
+  if (!budget || budget <= 0) return null;
+
+  return {
+    category,
+    spent,
+    budget
+  };
+})
+.filter(Boolean);
+
   // ==============================
   // 📈 WEALTH GRAPH
   // ==============================
@@ -257,6 +280,24 @@ export default function Dashboard() {
           />
         )}
       </div>
+
+      <h3>🎯 Budget vs Actual</h3>
+
+        {budgetData.length > 0 ? (
+          <BarChart width={700} height={300} data={budgetData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="category" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="budget" fill="#22c55e" />
+            <Bar dataKey="spent" fill="#ef4444" />
+          </BarChart>
+        ) : (
+          <p style={{ color: "#9ca3af" }}>
+            No budgets set yet
+          </p>
+        )}
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginTop: "20px" }}>
         <div>
