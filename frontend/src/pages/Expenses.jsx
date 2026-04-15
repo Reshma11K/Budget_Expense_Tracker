@@ -47,6 +47,7 @@ const PAYMENT_METHODS = [
   "Edenred", "Amex", "Gebührenfrei", "Trade Republic"
 ];
 
+
 export default function Expenses() {
 
   const months = generateMonths();
@@ -60,9 +61,11 @@ export default function Expenses() {
 
   const [tab, setTab] = useState("Variable");
 
-  const [category, setCategory] = useState("");
-  const [name, setName] = useState("");
-  const [payment, setPayment] = useState("");
+  const normalize = (str) => str?.toLowerCase().trim();
+
+  const [category, setCategory] = useState([]);
+  const [name, setName] = useState([]);
+  const [payment, setPayment] = useState([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
@@ -126,9 +129,12 @@ export default function Expenses() {
           expense_type: tab
         })
       });
-    bumpCacheVersion(); //
+
+
 
       if (!res.ok) throw new Error("Failed");
+
+      bumpCacheVersion(); //
 
       const updated = await getExpenses(month);
       setData(updated);
@@ -164,9 +170,18 @@ export default function Expenses() {
       const itemDate = item.date?.split("T")[0];
 
       return (
-        (category ? item.category === category : true) &&
-        (name ? item.name === name : true) &&
-        (payment ? item.payment_method === payment : true) &&
+        (category.length
+          ? category.map(normalize).includes(normalize(item.category))
+          : true) &&
+
+        (name.length
+          ? name.map(normalize).includes(normalize(item.name))
+          : true) &&
+
+        (payment.length
+          ? payment.map(normalize).includes(normalize(item.payment_method))
+          : true) &&
+
         (startDate ? itemDate >= startDate : true) &&
         (endDate ? itemDate <= endDate : true)
       );
@@ -226,13 +241,34 @@ export default function Expenses() {
           Authorization: `Bearer ${token}`
         }
       });
-    bumpCacheVersion();
+
     }
+    bumpCacheVersion();
+
 
     const refreshed = await getExpenses(month);
     setData(refreshed);
     setEditedData(refreshed);
   };
+
+
+const uniqueNames = [
+  ...new Map(
+    data.map(i => [normalize(i.name), i.name])
+  ).values()
+];
+
+const uniqueCategories = [
+  ...new Map(
+    data.map(i => [normalize(i.category), i.category])
+  ).values()
+];
+
+const uniquePayments = [
+  ...new Map(
+    data.map(i => [normalize(i.payment_method), i.payment_method])
+  ).values()
+];
 
   // ==============================
   // UI
@@ -292,19 +328,34 @@ export default function Expenses() {
           {months.map(m => <option key={m}>{m}</option>)}
         </select>
 
-        <select value={category} onChange={(e) => setCategory(e.target.value)}>
-          <option value="">All Categories</option>
-          {[...new Set(data.map(i => i.category))].map(c => <option key={c}>{c}</option>)}
+        <select
+          multiple
+          value={category}
+          onChange={(e) =>
+            setCategory(Array.from(e.target.selectedOptions, opt => opt.value))
+          }
+        >
+          {uniqueCategories.map(c => <option key={c}>{c}</option>)}
         </select>
 
-        <select value={name} onChange={(e) => setName(e.target.value)}>
-          <option value="">All Names</option>
-          {[...new Set(data.map(i => i.name))].map(n => <option key={n}>{n}</option>)}
+        <select
+          multiple
+          value={name}
+          onChange={(e) =>
+            setName(Array.from(e.target.selectedOptions, opt => opt.value))
+          }
+        >
+          {uniqueNames.map(n => <option key={n}>{n}</option>)}
         </select>
 
-        <select value={payment} onChange={(e) => setPayment(e.target.value)}>
-          <option value="">All Payments</option>
-          {[...new Set(data.map(i => i.payment_method))].map(p => <option key={p}>{p}</option>)}
+        <select
+          multiple
+          value={payment}
+          onChange={(e) =>
+            setPayment(Array.from(e.target.selectedOptions, opt => opt.value))
+          }
+        >
+          {uniquePayments.map(p => <option key={p}>{p}</option>)}
         </select>
 
         <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
@@ -320,7 +371,9 @@ export default function Expenses() {
         </button>
 
         <button onClick={() => {
-          setCategory(""); setName(""); setPayment(""); setStartDate(""); setEndDate("");
+          setCategory([]);
+          setName([]);
+          setPayment([]); setStartDate(""); setEndDate("");
         }}>
           Reset
         </button>

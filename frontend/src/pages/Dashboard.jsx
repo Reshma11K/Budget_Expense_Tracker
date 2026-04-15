@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getIncome, getExpenses } from "../api/api";
+import { getIncome, getExpenses, getBudgets } from "../api/api";
 import {
   PieChart, Pie, Cell, Tooltip,
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -45,9 +45,7 @@ export default function Dashboard() {
   const [expenses, setExpenses] = useState([]);
   const [trendData, setTrendData] = useState([]);
 
-  const [budgets, setBudgets] = useState(
-  JSON.parse(localStorage.getItem("budgets")) || {}
-  );
+  const [budgets, setBudgets] = useState({});
 
   const [corpus, setCorpus] = useState(
     Number(localStorage.getItem("corpus")) || 0
@@ -61,11 +59,12 @@ export default function Dashboard() {
   // ==============================
   // FETCH CURRENT MONTH (CACHED)
   // ==============================
+ const version = getCacheVersion();
+
  useEffect(() => {
   const token = localStorage.getItem("token");
   if (!token) return;
 
-  const version = localStorage.getItem("dataVersion") || "0";
   const cacheKey = `dashboard-${month}-v${version}`;
 
   const cached = localStorage.getItem(cacheKey);
@@ -90,45 +89,60 @@ export default function Dashboard() {
         })
       );
     });
-}, [month]);
+}, [month, version]);
 
   // ==============================
   // FETCH TREND DATA (CACHED FIXED)
   // ==============================
-  useEffect(() => {
-   const version = localStorage.getItem("dataVersion") || "0";
-   const cacheKey = `trendData-v${version}`;
-   const cached = localStorage.getItem(cacheKey);
+        //const version = getCacheVersion();
+    useEffect(() => {
+      const token = localStorage.getItem("token");
+      if (!token) return;
 
-    if (!token) return;
+      const cacheKey = `trendData-v${version}`;
+      const cached = localStorage.getItem(cacheKey);
 
-    const cached = localStorage.getItem("trendData");
-
-    if (cached) {
-      setTrendData(JSON.parse(cached));
-      return;
-    }
-
-    const load = async () => {
-      let data = [];
-
-      for (let m of months) {
-        const inc = await getIncome(m);
-        const exp = await getExpenses(m);
-
-        data.push({
-          month: m,
-          income: (inc || []).reduce((s, i) => s + i.amount, 0),
-          expenses: (exp || []).reduce((s, e) => s + e.amount, 0)
-        });
+      if (cached) {
+        setTrendData(JSON.parse(cached));
+        return;
       }
 
-      setTrendData(data);
-      localStorage.setItem("trendData", JSON.stringify(data));
-    };
+      const load = async () => {
+        let data = [];
 
-    load();
-  }, []); // ✅ FIXED (was [month])
+        for (let m of months) {
+          const inc = await getIncome(m);
+          const exp = await getExpenses(m);
+
+          data.push({
+            month: m,
+            income: (inc || []).reduce((s, i) => s + i.amount, 0),
+            expenses: (exp || []).reduce((s, e) => s + e.amount, 0)
+          });
+        }
+
+        setTrendData(data);
+        localStorage.setItem(cacheKey, JSON.stringify(data));
+      };
+
+      load();
+    }, [version]);
+
+    useEffect(() => {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      getBudgets(month)
+        .then((res) => {
+          const mapped = {};
+          res.forEach((b) => {
+            mapped[b.category] = b.budget;
+          });
+          setBudgets(mapped);
+        })
+        .catch(() => setBudgets({}));
+    }, [month]);
+
 
   // ==============================
   // CALCULATIONS

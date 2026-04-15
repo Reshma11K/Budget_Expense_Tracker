@@ -46,8 +46,10 @@ export default function Income() {
   const [data, setData] = useState([]);
   const [editedData, setEditedData] = useState([]);
 
-  const [category, setCategory] = useState("");
-  const [source, setSource] = useState("");
+  const normalize = (str) => str?.toLowerCase().trim();
+
+  const [category, setCategory] = useState([]);
+  const [source, setSource] = useState([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
@@ -103,10 +105,10 @@ export default function Income() {
         })
       });
 
-  bumpCacheVersion();
-
 
       if (!res.ok) throw new Error("Failed");
+
+      bumpCacheVersion();
 
       const updated = await getIncome(month);
       setData(updated);
@@ -133,8 +135,13 @@ export default function Income() {
       const itemDate = item.date?.split("T")[0];
 
       return (
-        (category ? item.category === category : true) &&
-        (source ? item.source === source : true) &&
+        (category.length
+          ? category.map(normalize).includes(normalize(item.category))
+          : true) &&
+
+        (source.length
+          ? source.map(normalize).includes(normalize(item.source))
+          : true) &&
         (startDate ? itemDate >= startDate : true) &&
         (endDate ? itemDate <= endDate : true)
       );
@@ -177,6 +184,7 @@ export default function Income() {
     const refreshed = await getIncome(month);
     setData(refreshed);
     setEditedData(refreshed);
+    bumpCacheVersion();
   };
 
   // ==============================
@@ -193,11 +201,25 @@ export default function Income() {
         }
       });
     }
+    bumpCacheVersion();
 
     const refreshed = await getIncome(month);
     setData(refreshed);
     setEditedData(refreshed);
   };
+
+    const uniqueCategories = [
+      ...new Map(
+        data.map(i => [normalize(i.category), i.category])
+      ).values()
+    ];
+
+    const uniqueSources = [
+      ...new Map(
+        data.map(i => [normalize(i.source), i.source])
+      ).values()
+    ];
+
 
   // ==============================
   // 🎨 UI
@@ -260,18 +282,24 @@ export default function Income() {
           ))}
         </select>
 
-        <select value={category} onChange={(e) => setCategory(e.target.value)}>
-          <option value="">All Categories</option>
-          {[...new Set(data.map((i) => i.category))].map((c) => (
-            <option key={c}>{c}</option>
-          ))}
+        <select
+          multiple
+          value={category}
+          onChange={(e) =>
+            setCategory(Array.from(e.target.selectedOptions, opt => opt.value))
+          }
+        >
+          {uniqueCategories.map(c => <option key={c}>{c}</option>)}
         </select>
 
-        <select value={source} onChange={(e) => setSource(e.target.value)}>
-          <option value="">All Sources</option>
-          {[...new Set(data.map((i) => i.source))].map((s) => (
-            <option key={s}>{s}</option>
-          ))}
+        <select
+          multiple
+          value={source}
+          onChange={(e) =>
+            setSource(Array.from(e.target.selectedOptions, opt => opt.value))
+          }
+        >
+          {uniqueSources.map(s => <option key={s}>{s}</option>)}
         </select>
 
         <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
@@ -287,8 +315,8 @@ export default function Income() {
         </button>
 
         <button onClick={() => {
-          setCategory("");
-          setSource("");
+          setCategory([]);
+          setSource([]);
           setStartDate("");
           setEndDate("");
         }}>
