@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getExpenses } from "../api/api";
 import { bumpCacheVersion } from "../utils/cache";
+import Select from "react-select";
 
 const API_URL = "https://budget-expense-tracker-backend-o965.onrender.com";
 
@@ -328,35 +329,66 @@ const uniquePayments = [
           {months.map(m => <option key={m}>{m}</option>)}
         </select>
 
-        <select
-          multiple
-          value={category}
-          onChange={(e) =>
-            setCategory(Array.from(e.target.selectedOptions, opt => opt.value))
+        <Select
+          isMulti
+          options={uniqueCategories.map(c => ({
+            value: c,
+            label: c
+          }))}
+          value={category.map(c => ({ value: c, label: c }))}
+          onChange={(selected) =>
+            setCategory(selected ? selected.map(s => s.value) : [])
           }
-        >
-          {uniqueCategories.map(c => <option key={c}>{c}</option>)}
-        </select>
+          placeholder="Filter Category..."
+          styles={{
+            control: (base) => ({
+              ...base,
+              backgroundColor: "#020617",
+              borderColor: "#334155",
+              color: "white",
+              minWidth: "200px"
+            }),
+            menu: (base) => ({
+              ...base,
+              backgroundColor: "#020617",
+              color: "white"
+            }),
+            multiValue: (base) => ({
+              ...base,
+              backgroundColor: "#334155"
+            }),
+            multiValueLabel: (base) => ({
+              ...base,
+              color: "white"
+            })
+          }}
+        />
 
-        <select
-          multiple
-          value={name}
-          onChange={(e) =>
-            setName(Array.from(e.target.selectedOptions, opt => opt.value))
+        <Select
+          isMulti
+          options={uniqueNames.map(n => ({
+            value: n,
+            label: n
+          }))}
+          value={name.map(n => ({ value: n, label: n }))}
+          onChange={(selected) =>
+            setName(selected ? selected.map(s => s.value) : [])
           }
-        >
-          {uniqueNames.map(n => <option key={n}>{n}</option>)}
-        </select>
+          placeholder="Filter Name..."
+        />
 
-        <select
-          multiple
-          value={payment}
-          onChange={(e) =>
-            setPayment(Array.from(e.target.selectedOptions, opt => opt.value))
+        <Select
+          isMulti
+          options={uniquePayments.map(p => ({
+            value: p,
+            label: p
+          }))}
+          value={payment.map(p => ({ value: p, label: p }))}
+          onChange={(selected) =>
+            setPayment(selected ? selected.map(s => s.value) : [])
           }
-        >
-          {uniquePayments.map(p => <option key={p}>{p}</option>)}
-        </select>
+          placeholder="Filter Payment..."
+        />
 
         <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
         <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />

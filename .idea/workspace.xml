@@ -4,11 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="54592e58-93b8-4572-b018-559b60e49bb7" name="Changes" comment="updated cache">
+    <list default="true" id="54592e58-93b8-4572-b018-559b60e49bb7" name="Changes" comment="updated dashboard,expenses, income">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Dashboard.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Dashboard.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/pages/Expenses.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Expenses.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/Income.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/Income.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -98,14 +97,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1768409758745</updated>
-    </task>
-    <task id="LOCAL-00008" summary="Added dotenv dependency">
-      <option name="closed" value="true" />
-      <created>1771528033090</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1771528033090</updated>
     </task>
     <task id="LOCAL-00009" summary="Hard coded credentials">
       <option name="closed" value="true" />
@@ -491,7 +482,15 @@
       <option name="project" value="LOCAL" />
       <updated>1776179453435</updated>
     </task>
-    <option name="localTasksCounter" value="57" />
+    <task id="LOCAL-00057" summary="updated dashboard,expenses, income">
+      <option name="closed" value="true" />
+      <created>1776270688138</created>
+      <option name="number" value="00057" />
+      <option name="presentableId" value="LOCAL-00057" />
+      <option name="project" value="LOCAL" />
+      <updated>1776270688139</updated>
+    </task>
+    <option name="localTasksCounter" value="58" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -533,7 +532,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="updated month picker in dashboard" />
     <MESSAGE value="clean service layer" />
     <MESSAGE value="Created a minimal API server" />
     <MESSAGE value="updated main.py" />
@@ -558,7 +556,8 @@
     <MESSAGE value="code updated for dashboard" />
     <MESSAGE value="code updated for delete and edit" />
     <MESSAGE value="updated cache" />
-    <option name="LAST_COMMIT_MESSAGE" value="updated cache" />
+    <MESSAGE value="updated dashboard,expenses, income" />
+    <option name="LAST_COMMIT_MESSAGE" value="updated dashboard,expenses, income" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
