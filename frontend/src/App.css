@@ -182,3 +182,33 @@
     border-right-color: var(--border);
   }
 }
+
+
+/* 🔥 DARK THEME FORM FIX */
+input,
+select {
+  background-color: #0f172a; /* dark navy */
+  color: #e5e7eb; /* light text */
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 8px 10px;
+  outline: none;
+  transition: 0.2s;
+}
+
+/* focus glow */
+input:focus,
+select:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
+}
+
+/* placeholder styling */
+input::placeholder {
+  color: #9ca3af;
+}
+
+/* multi-select fix */
+select[multiple] {
+  min-height: 100px;
+}

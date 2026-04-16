@@ -331,35 +331,27 @@ const uniquePayments = [
 
         <Select
           isMulti
-          options={uniqueCategories.map(c => ({
-            value: c,
-            label: c
-          }))}
-          value={category.map(c => ({ value: c, label: c }))}
+          options={uniqueNames.map(n => ({ label: n, value: n }))}
+          value={name.map(n => ({ label: n, value: n }))}
           onChange={(selected) =>
-            setCategory(selected ? selected.map(s => s.value) : [])
+            setName(selected.map(s => s.value))
           }
-          placeholder="Filter Category..."
           styles={{
             control: (base) => ({
               ...base,
-              backgroundColor: "#020617",
+              backgroundColor: "#0f172a",
               borderColor: "#334155",
-              color: "white",
-              minWidth: "200px"
+              color: "#fff"
             }),
             menu: (base) => ({
               ...base,
-              backgroundColor: "#020617",
-              color: "white"
+              backgroundColor: "#0f172a",
+              color: "#fff"
             }),
             multiValue: (base) => ({
               ...base,
-              backgroundColor: "#334155"
-            }),
-            multiValueLabel: (base) => ({
-              ...base,
-              color: "white"
+              backgroundColor: "#6366f1",
+              color: "#fff"
             })
           }}
         />
