@@ -331,27 +331,35 @@ const uniquePayments = [
 
         <Select
           isMulti
-          options={uniqueNames.map(n => ({ label: n, value: n }))}
-          value={name.map(n => ({ label: n, value: n }))}
+          options={uniqueCategories.map(c => ({
+            value: c,
+            label: c
+          }))}
+          value={category.map(c => ({ value: c, label: c }))}
           onChange={(selected) =>
-            setName(selected.map(s => s.value))
+            setCategory(selected ? selected.map(s => s.value) : [])
           }
+          placeholder="Filter Category..."
           styles={{
             control: (base) => ({
               ...base,
-              backgroundColor: "#0f172a",
+              backgroundColor: "#020617",
               borderColor: "#334155",
-              color: "#fff"
+              color: "white",
+              minWidth: "200px"
             }),
             menu: (base) => ({
               ...base,
-              backgroundColor: "#0f172a",
-              color: "#fff"
+              backgroundColor: "#020617",
+              color: "white"
             }),
             multiValue: (base) => ({
               ...base,
-              backgroundColor: "#6366f1",
-              color: "#fff"
+              backgroundColor: "#334155"
+            }),
+            multiValueLabel: (base) => ({
+              ...base,
+              color: "white"
             })
           }}
         />
@@ -369,18 +377,18 @@ const uniquePayments = [
           placeholder="Filter Name..."
         />
 
-        <Select
-          isMulti
-          options={uniquePayments.map(p => ({
-            value: p,
-            label: p
-          }))}
-          value={payment.map(p => ({ value: p, label: p }))}
-          onChange={(selected) =>
-            setPayment(selected ? selected.map(s => s.value) : [])
-          }
-          placeholder="Filter Payment..."
-        />
+    <Select
+      isMulti
+      options={uniquePayments.map(p => ({
+        value: p,
+        label: p
+      }))}
+      value={payment.map(p => ({ value: p, label: p }))}
+      onChange={(selected) =>
+        setPayment(selected ? selected.map(s => s.value) : [])
+      }
+      placeholder="Filter Payment..."
+    />
 
         <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
         <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
